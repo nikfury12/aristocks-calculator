@@ -1,4 +1,4 @@
-const CACHE_KEY = 'futures:v1';
+const CACHE_URL = 'https://cache.aristocks.internal/futures-v1';
 const FRESH_FOR_MS = 15 * 60 * 1000;
 const MOEX_ENDPOINT = 'https://iss.moex.com/iss/engines/futures/markets/forts/boards/RFUD/securities.json';
 const COLUMNS = ['SECID', 'SHORTNAME', 'LASTTRADEDATE', 'MINSTEP', 'STEPPRICE', 'INITIALMARGIN', 'PREVSETTLEPRICE', 'ASSETCODE'];
@@ -83,7 +83,7 @@ function normalize(rows) {
   return [...unique.values()].sort((a, b) => a.expiry.localeCompare(b.expiry, 'ru') || a.secid.localeCompare(b.secid, 'ru'));
 }
 
-async function refreshData(env) {
+async function refreshData() {
   const contracts = normalize(await loadAllRows());
   if (contracts.length < 20) throw new Error(`Only ${contracts.length} valid contracts received`);
   const document = {
@@ -92,15 +92,25 @@ async function refreshData(env) {
     count: contracts.length,
     contracts,
   };
-  await env.FUTURES_CACHE.put(CACHE_KEY, JSON.stringify(document));
+  await caches.default.put(CACHE_URL, new Response(JSON.stringify(document), {
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'public, max-age=604800',
+    },
+  }));
   return document;
 }
 
-async function futuresResponse(env, ctx) {
-  const cached = await env.FUTURES_CACHE.get(CACHE_KEY, 'json');
+async function cachedData() {
+  const response = await caches.default.match(CACHE_URL);
+  return response ? response.json() : null;
+}
+
+async function futuresResponse(ctx) {
+  const cached = await cachedData();
   if (!cached) {
     try {
-      return jsonResponse(await refreshData(env));
+      return jsonResponse(await refreshData());
     } catch (error) {
       return jsonResponse({ error: 'Futures data is temporarily unavailable' }, 503, 'unavailable');
     }
@@ -108,7 +118,7 @@ async function futuresResponse(env, ctx) {
 
   const updatedAt = new Date(cached.updatedAt).getTime();
   const fresh = Number.isFinite(updatedAt) && Date.now() - updatedAt < FRESH_FOR_MS;
-  if (!fresh) ctx.waitUntil(refreshData(env).catch(error => console.error('MOEX refresh failed', error)));
+  if (!fresh) ctx.waitUntil(refreshData().catch(error => console.error('MOEX refresh failed', error)));
   return jsonResponse(cached, 200, fresh ? 'fresh' : 'refreshing');
 }
 
@@ -119,16 +129,12 @@ export default {
       if (request.method !== 'GET' && request.method !== 'HEAD') {
         return new Response('Method Not Allowed', { status: 405, headers: { Allow: 'GET, HEAD' } });
       }
-      const response = await futuresResponse(env, ctx);
+      const response = await futuresResponse(ctx);
       return request.method === 'HEAD'
         ? new Response(null, { status: response.status, headers: response.headers })
         : response;
     }
     if (url.pathname.startsWith('/api/')) return jsonResponse({ error: 'Not found' }, 404, 'unavailable');
     return env.ASSETS.fetch(request);
-  },
-
-  async scheduled(controller, env, ctx) {
-    ctx.waitUntil(refreshData(env).catch(error => console.error('Scheduled MOEX refresh failed', error)));
   },
 };
