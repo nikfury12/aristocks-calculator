@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "aristocks-calculator",
+  "main": "./_worker.js",
+  "compatibility_date": "2026-08-06",
+  "build": {
+    "command": "node scripts/build-worker-assets.mjs"
+  },
+  "assets": {
+    "directory": "./.worker-assets",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "observability": {
+    "enabled": true
+  }
+}

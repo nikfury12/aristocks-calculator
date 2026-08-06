@@ -21,7 +21,6 @@ function closeSuggestions(){instrumentList.hidden=true;instrument.setAttribute('
 function markSuggestion(index){activeSuggestion=Math.max(0,Math.min(index,suggestionItems.length-1));const options=instrumentList.querySelectorAll('.instrument-option');options.forEach((node,i)=>node.setAttribute('aria-selected',String(i===activeSuggestion)));options[activeSuggestion]?.scrollIntoView({block:'nearest'})}
 function renderSuggestions(query='',showAll=false){suggestionItems=searchInstruments(query,showAll);instrumentList.replaceChildren();if(!suggestionItems.length){const empty=document.createElement('div');empty.className='instrument-empty';empty.textContent='Контракт не найден. Например: Si-9.26';instrumentList.append(empty)}else suggestionItems.forEach(item=>{const option=document.createElement('button');option.type='button';option.className='instrument-option';option.setAttribute('role','option');option.setAttribute('aria-selected','false');const code=document.createElement('strong');code.textContent=displayCode(item);const meta=document.createElement('small');meta.textContent=`${item.secid} · до ${humanDate(item.expiry)}`;option.append(code,meta);option.addEventListener('mousedown',event=>event.preventDefault());option.addEventListener('click',()=>chooseInstrument(item,true));instrumentList.append(option)});instrumentList.hidden=false;instrument.setAttribute('aria-expanded','true');activeSuggestion=-1}
 function populate(list){const selected=list.find(x=>x.secid===current?.secid)||list.find(x=>normalizeSearch(displayCode(x))===normalizeSearch(instrument.value))||list[0];current=selected;instrument.value=displayCode(current);updateInstrumentInfo();calculate()}
-async function load(){try{const c=['SECID','SHORTNAME','LASTTRADEDATE','MINSTEP','STEPPRICE','INITIALMARGIN','PREVSETTLEPRICE'];const r=await fetch(`https://iss.moex.com/iss/engines/futures/markets/forts/securities.json?iss.meta=off&iss.only=securities&securities.columns=${c.join(',')}`,{signal:AbortSignal.timeout(6000)});const p=await r.json(),i=Object.fromEntries(p.securities.columns.map((x,n)=>[x,n]));const list=p.securities.data.map(row=>({secid:row[i.SECID],name:row[i.SHORTNAME],expiry:row[i.LASTTRADEDATE],minStep:num(row[i.MINSTEP]),stepPrice:num(row[i.STEPPRICE]),margin:num(row[i.INITIALMARGIN]),price:num(row[i.PREVSETTLEPRICE])})).filter(x=>x.secid&&x.minStep>0&&x.stepPrice>0&&x.margin>0).slice(0,150);if(!list.length)throw Error();instruments=list;populate(list);el.status.classList.add('ready');el.status.lastChild.textContent=' MOEX · онлайн'}catch{populate(fallback);el.status.lastChild.textContent=' резервные данные'}}
 function calculate(){
  const data=new FormData(form),mode=data.get('riskMode')||'percent',entry=num(el.entry.value),stop=num(el.stop.value),account=num(el.account.value),risk=num(el.risk.value),target=num(el.target.value);
  const direction=stop<entry?'BUY':'SELL',distance=Math.abs(entry-stop),unit=current.stepPrice/current.minStep,cost=6+current.stepPrice*2,riskOne=distance*unit+cost,budget=mode==='rubles'?risk:account*risk/100,contracts=Math.max(0,Math.floor(budget/riskOne));
@@ -39,19 +38,19 @@ instrument.addEventListener('focus',()=>renderSuggestions(instrument.value));ins
 $('#copy').addEventListener('click',async()=>{await navigator.clipboard.writeText(el.note.textContent);$('#copy').textContent='Скопировано';setTimeout(()=>$('#copy').textContent='Скопировать расчёт',1200)});
 $('#reset').addEventListener('click',()=>{form.reset();current=instruments[0];instrument.value=displayCode(current);updateInstrumentInfo();el.entry.value=95000;el.stop.value=94000;setMode('percent',false)});
 try{const saved=JSON.parse(localStorage.getItem('aristocks-trader'));if(saved){el.account.value=saved.account||150000;el.risk.value=saved.risk||1;const radio=$(`[name="riskMode"][value="${saved.mode}"]`);if(radio){radio.checked=true;setMode(saved.mode,false)}}}catch{}
-async function loadStatic(){
+async function loadContracts(){
  try{
-  const response=await fetch('https://raw.githubusercontent.com/nikfury12/aristocks-futures-data/main/data/futures.json',{cache:'no-cache',signal:AbortSignal.timeout(6000)});
+  const response=await fetch('/api/futures',{signal:AbortSignal.timeout(5000)});
   if(!response.ok)throw Error(`HTTP ${response.status}`);
   const payload=await response.json(),list=Array.isArray(payload.contracts)?payload.contracts:[];
   if(!list.length)throw Error('Empty contract list');
   instruments=list;populate(list);
-  const updated=new Date(payload.updatedAt),stale=!Number.isFinite(updated.getTime())||Date.now()-updated.getTime()>86400000;
-  el.status.classList.toggle('ready',!stale);
-  el.status.lastChild.textContent=stale?' MOEX · данные устарели':` MOEX · ${updated.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}`;
-  el.status.title=stale?'Данные не обновлялись более суток':`Обновлено: ${updated.toLocaleString('ru-RU')}`;
+  const fresh=payload.status==='fresh';
+  el.status.classList.toggle('ready',fresh);
+  el.status.lastChild.textContent=fresh?' MOEX · актуально':' MOEX · обновляем';
+  el.status.title=fresh?'Параметры контрактов получены с Московской биржи':'Используем последнюю успешную версию и обновляем данные';
  }catch{
-  populate(fallback);el.status.classList.remove('ready');el.status.lastChild.textContent=' нет свежих данных';el.status.title='Не удалось загрузить справочник контрактов';
+  populate(fallback);el.status.classList.remove('ready');el.status.lastChild.textContent=' MOEX · резерв';el.status.title='Источник временно недоступен — используются резервные данные';
  }
 }
-populate(fallback);loadStatic();
+populate(fallback);loadContracts();
