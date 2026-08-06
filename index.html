@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Быстрый расчёт позиции — Aristocks</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="trader-calculator.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="index.html">АРИСТОКС</a>
+    <span id="data-status"><i></i> MOEX</span>
+    <a class="telegram-link header-telegram" href="https://t.me/aristocks" target="_blank" rel="noopener">Telegram <span>↗</span></a>
+  </header>
+
+  <main>
+    <div class="title-row">
+      <div><h1>Размер позиции</h1><p>Введите условия сделки. Расчёт появится сразу.</p></div>
+      <button id="reset" type="button">Сбросить</button>
+    </div>
+
+    <section class="calculator" aria-label="Быстрый расчёт позиции">
+      <form id="trade-form" novalidate>
+        <div class="field instrument-field">
+          <label for="instrument">Контракт</label>
+          <div class="instrument-control">
+            <input id="instrument" name="instrument" role="combobox" aria-autocomplete="list" aria-controls="instrument-list" aria-expanded="false" autocomplete="off" spellcheck="false" placeholder="Si-9.26 или SiU6" value="Si-9.26">
+            <button id="instrument-toggle" type="button" tabindex="-1" aria-label="Показать контракты">⌄</button>
+            <div id="instrument-list" class="instrument-list" role="listbox" hidden></div>
+          </div>
+          <small id="instrument-meta">Доллар / рубль · экспирация 17.09.2026</small>
+          <strong id="expiry-warning" hidden></strong>
+        </div>
+
+        <div class="pair prices">
+          <label class="field"><span>Вход</span><input id="entry" name="entry" type="number" value="95000" min="0" step="any" inputmode="decimal"></label>
+          <label class="field"><span>Стоп</span><input id="stop" name="stop" type="number" value="94000" min="0" step="any" inputmode="decimal"></label>
+        </div>
+
+        <div class="risk-head">
+          <span>Риск</span>
+          <fieldset>
+            <legend class="sr-only">Единица риска</legend>
+            <label><input type="radio" name="riskMode" value="percent" checked><span>%</span></label>
+            <label><input type="radio" name="riskMode" value="rubles"><span>₽</span></label>
+          </fieldset>
+        </div>
+
+        <div class="pair risk-pair">
+          <label class="field" id="account-field"><span>Счёт</span><div><input id="account" name="account" type="number" value="150000" min="0" step="1000" inputmode="decimal"><b>₽</b></div></label>
+          <label class="field"><span>На сделку</span><div><input id="risk" name="risk" type="number" value="1" min="0" step="0.1" inputmode="decimal"><b id="risk-unit">%</b></div></label>
+        </div>
+
+        <details>
+          <summary>Есть цель сделки <span>+</span></summary>
+          <label class="field target-field"><span>Цель</span><input id="target" name="target" type="number" min="0" step="any" inputmode="decimal" placeholder="Необязательно"></label>
+        </details>
+      </form>
+
+      <aside class="answer" aria-live="polite">
+        <div class="answer-head"><span id="direction">Покупка</span><span id="state">Расчёт готов</span></div>
+        <div class="main-answer"><span>Открыть</span><strong id="contracts">1</strong><b id="contract-word">контракт</b></div>
+        <dl>
+          <div class="primary"><dt>Убыток по стопу</dt><dd id="loss">—</dd></div>
+          <div><dt>Требуемое ГО</dt><dd id="margin">—</dd></div>
+          <div><dt>Стоп</dt><dd id="stop-distance">—</dd></div>
+          <div id="profit-row" hidden><dt>Прибыль на цели</dt><dd id="profit">—</dd></div>
+        </dl>
+        <p id="note">Учитываем комиссию и проскальзывание.</p>
+        <button id="copy" type="button">Скопировать расчёт</button>
+      </aside>
+    </section>
+
+    <section class="about-strip" aria-label="Об Aristocks">
+      <div class="about-mark" aria-hidden="true">A</div>
+      <div class="about-copy">
+        <span>Инструмент Aristocks</span>
+        <p>Разбираем российский рынок: показываем не просто действие, а его логику и риски.</p>
+      </div>
+      <div class="about-proof"><strong>с 2019</strong><span>говорим о рынке</span></div>
+      <div class="social-actions" aria-label="Каналы Aristocks">
+        <a class="telegram-link about-telegram" href="https://t.me/aristocks" target="_blank" rel="noopener"><span>Основной канал</span><b>Telegram ↗</b></a>
+        <div class="social-alternatives">
+          <a href="https://max.ru/id501007669220_biz" target="_blank" rel="noopener">MAX ↗</a>
+          <a href="https://vk.ru/aristocks" target="_blank" rel="noopener">VK ↗</a>
+        </div>
+      </div>
+    </section>
+    <footer class="utility-footer">
+      <p>Расчёт справочный и не является индивидуальной инвестиционной рекомендацией.</p>
+        <a href="https://t.me/aristocks_bot" target="_blank" rel="noopener">Нашли ошибку? Напишите нам ↗</a>
+    </footer>
+  </main>
+  <script src="trader-calculator.js"></script>
+</body>
+</html>

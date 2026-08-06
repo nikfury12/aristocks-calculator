@@ -1,0 +1,57 @@
+const fallback=[
+ {secid:'Si-9.26',name:'Доллар / рубль',expiry:'17.09.2026',minStep:1,stepPrice:1,margin:25000,price:95000},
+ {secid:'RI-9.26',name:'Индекс РТС',expiry:'17.09.2026',minStep:10,stepPrice:12.37,margin:35000,price:112000},
+ {secid:'BR-9.26',name:'Brent',expiry:'01.09.2026',minStep:.01,stepPrice:.79,margin:9000,price:68}
+];
+const $=s=>document.querySelector(s),form=$('#trade-form'),instrument=$('#instrument'),instrumentList=$('#instrument-list');
+const el={entry:$('#entry'),stop:$('#stop'),account:$('#account'),risk:$('#risk'),target:$('#target'),accountField:$('#account-field'),riskPair:$('.risk-pair'),riskUnit:$('#risk-unit'),contracts:$('#contracts'),word:$('#contract-word'),direction:$('#direction'),state:$('#state'),loss:$('#loss'),margin:$('#margin'),distance:$('#stop-distance'),profit:$('#profit'),profitRow:$('#profit-row'),note:$('#note'),answer:$('.answer'),status:$('#data-status'),instrumentMeta:$('#instrument-meta'),expiryWarning:$('#expiry-warning')};
+let instruments=fallback,current=fallback[0];
+const num=v=>{const n=Number(String(v).replace(',','.'));return Number.isFinite(n)?n:0};
+const money=v=>Number.isFinite(v)?`${new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(v)} ₽`:'—';
+const price=v=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:4}).format(v);
+function word(n){const a=n%100,b=n%10;return a>=11&&a<=14?'контрактов':b===1?'контракт':b>=2&&b<=4?'контракта':'контрактов'}
+function parseExpiry(value){if(!value)return null;if(/^\d{4}-\d{2}-\d{2}$/.test(value))return new Date(`${value}T23:59:59`);const m=value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);return m?new Date(`${m[3]}-${m[2]}-${m[1]}T23:59:59`):null}
+function updateInstrumentInfo(){el.instrumentMeta.textContent=`${current.name} · экспирация ${current.expiry}`;const date=parseExpiry(current.expiry),days=date?Math.ceil((date-new Date())/86400000):null;el.expiryWarning.hidden=days===null||days>=7;if(days!==null&&days<7)el.expiryWarning.textContent=days<=0?'Экспирация сегодня. Проверьте следующую серию.':`До экспирации ${days} дн. Проверьте следующую серию.`}
+const displayCode=x=>x.name&&/\d/.test(x.name)?x.name:x.secid;
+const normalizeSearch=value=>String(value||'').toLowerCase().replace(/\s+/g,'');
+const humanDate=value=>{const date=parseExpiry(value);return date?date.toLocaleDateString('ru-RU'):'—'};
+let suggestionItems=[],activeSuggestion=-1;
+function searchInstruments(query,showAll=false){const q=normalizeSearch(query);return instruments.map(item=>{const name=normalizeSearch(displayCode(item)),secid=normalizeSearch(item.secid),asset=normalizeSearch(item.assetCode),family=name.split('-')[0];let score=9;if(!q&&showAll)score=6;else if(name===q||secid===q)score=0;else if(family===q||asset===q)score=1;else if(name.startsWith(q))score=2;else if(secid.startsWith(q))score=3;else if(asset&&asset.startsWith(q))score=4;else if(name.includes(q))score=5;else if(secid.includes(q))score=6;return{item,score}}).filter(x=>x.score<9).sort((a,b)=>a.score-b.score||String(a.item.expiry).localeCompare(String(b.item.expiry))||displayCode(a.item).localeCompare(displayCode(b.item),'ru')).slice(0,8).map(x=>x.item)}
+function closeSuggestions(){instrumentList.hidden=true;instrument.setAttribute('aria-expanded','false');activeSuggestion=-1}
+function markSuggestion(index){activeSuggestion=Math.max(0,Math.min(index,suggestionItems.length-1));const options=instrumentList.querySelectorAll('.instrument-option');options.forEach((node,i)=>node.setAttribute('aria-selected',String(i===activeSuggestion)));options[activeSuggestion]?.scrollIntoView({block:'nearest'})}
+function renderSuggestions(query='',showAll=false){suggestionItems=searchInstruments(query,showAll);instrumentList.replaceChildren();if(!suggestionItems.length){const empty=document.createElement('div');empty.className='instrument-empty';empty.textContent='Контракт не найден. Например: Si-9.26';instrumentList.append(empty)}else suggestionItems.forEach(item=>{const option=document.createElement('button');option.type='button';option.className='instrument-option';option.setAttribute('role','option');option.setAttribute('aria-selected','false');const code=document.createElement('strong');code.textContent=displayCode(item);const meta=document.createElement('small');meta.textContent=`${item.secid} · до ${humanDate(item.expiry)}`;option.append(code,meta);option.addEventListener('mousedown',event=>event.preventDefault());option.addEventListener('click',()=>chooseInstrument(item,true));instrumentList.append(option)});instrumentList.hidden=false;instrument.setAttribute('aria-expanded','true');activeSuggestion=-1}
+function populate(list){const selected=list.find(x=>x.secid===current?.secid)||list.find(x=>normalizeSearch(displayCode(x))===normalizeSearch(instrument.value))||list[0];current=selected;instrument.value=displayCode(current);updateInstrumentInfo();calculate()}
+async function load(){try{const c=['SECID','SHORTNAME','LASTTRADEDATE','MINSTEP','STEPPRICE','INITIALMARGIN','PREVSETTLEPRICE'];const r=await fetch(`https://iss.moex.com/iss/engines/futures/markets/forts/securities.json?iss.meta=off&iss.only=securities&securities.columns=${c.join(',')}`,{signal:AbortSignal.timeout(6000)});const p=await r.json(),i=Object.fromEntries(p.securities.columns.map((x,n)=>[x,n]));const list=p.securities.data.map(row=>({secid:row[i.SECID],name:row[i.SHORTNAME],expiry:row[i.LASTTRADEDATE],minStep:num(row[i.MINSTEP]),stepPrice:num(row[i.STEPPRICE]),margin:num(row[i.INITIALMARGIN]),price:num(row[i.PREVSETTLEPRICE])})).filter(x=>x.secid&&x.minStep>0&&x.stepPrice>0&&x.margin>0).slice(0,150);if(!list.length)throw Error();instruments=list;populate(list);el.status.classList.add('ready');el.status.lastChild.textContent=' MOEX · онлайн'}catch{populate(fallback);el.status.lastChild.textContent=' резервные данные'}}
+function calculate(){
+ const data=new FormData(form),mode=data.get('riskMode')||'percent',entry=num(el.entry.value),stop=num(el.stop.value),account=num(el.account.value),risk=num(el.risk.value),target=num(el.target.value);
+ const direction=stop<entry?'BUY':'SELL',distance=Math.abs(entry-stop),unit=current.stepPrice/current.minStep,cost=6+current.stepPrice*2,riskOne=distance*unit+cost,budget=mode==='rubles'?risk:account*risk/100,contracts=Math.max(0,Math.floor(budget/riskOne));
+ if(entry<=0||stop<=0||entry===stop||risk<=0||(mode==='percent'&&account<=0)){el.contracts.textContent='—';el.state.textContent='Проверьте ввод';el.answer.classList.add('error');return}
+ el.answer.classList.remove('error');el.state.textContent='Расчёт готов';el.direction.textContent=direction==='BUY'?'Покупка':'Продажа';el.contracts.textContent=contracts;el.word.textContent=word(contracts);el.loss.textContent=money(contracts*riskOne);el.margin.textContent=money(contracts*current.margin);el.distance.textContent=`${price(distance)} п. · ${new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(distance/entry*100)}%`;
+ const targetValid=target>0&&(direction==='BUY'?target>entry:target<entry);el.profitRow.hidden=!targetValid;if(targetValid)el.profit.textContent=money(contracts*(Math.abs(target-entry)*unit-cost));
+ el.note.textContent=contracts?`${direction} ${contracts} ${current.secid} · вход ${price(entry)} · стоп ${price(stop)}`:`Один контракт рискует ${money(riskOne)}. Увеличьте лимит или приблизьте стоп.`;
+ localStorage.setItem('aristocks-trader',JSON.stringify({account,risk,mode}));
+}
+function setMode(mode,convert=true){const rub=mode==='rubles',account=num(el.account.value),risk=num(el.risk.value);if(convert)el.risk.value=rub?Math.round(account*risk/100):(account?Number(risk/account*100).toFixed(2):1);el.accountField.hidden=rub;el.riskPair.classList.toggle('rubles',rub);el.riskUnit.textContent=rub?'₽':'%';el.risk.step=rub?'100':'.1';calculate()}
+function chooseInstrument(found,focusNext=false){if(!found)return false;current=found;instrument.value=displayCode(current);updateInstrumentInfo();closeSuggestions();if(current.price){el.entry.value=current.price;const d=Math.max(current.minStep*10,current.price*.01);el.stop.value=Number(current.price-d).toFixed(4).replace(/\.0+$/,'')}calculate();if(focusNext)el.entry.focus();return true}
+function selectInstrument(){const found=activeSuggestion>=0?suggestionItems[activeSuggestion]:searchInstruments(instrument.value)[0];return chooseInstrument(found)}
+form.addEventListener('input',e=>{if(e.target===instrument)renderSuggestions(instrument.value);else calculate()});form.addEventListener('change',e=>{if(e.target.name==='riskMode')setMode(e.target.value)});
+instrument.addEventListener('focus',()=>renderSuggestions(instrument.value));instrument.addEventListener('blur',()=>{setTimeout(()=>{closeSuggestions();instrument.value=displayCode(current)},100)});instrument.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();if(instrumentList.hidden)renderSuggestions(instrument.value,true);if(suggestionItems.length)markSuggestion(activeSuggestion+1)}else if(e.key==='ArrowUp'){e.preventDefault();if(suggestionItems.length)markSuggestion(activeSuggestion<=0?suggestionItems.length-1:activeSuggestion-1)}else if(e.key==='Escape'){closeSuggestions();instrument.value=displayCode(current)}else if(e.key==='Enter'){e.preventDefault();if(selectInstrument())el.entry.focus()}});$('#instrument-toggle').addEventListener('click',()=>{if(instrumentList.hidden){instrument.focus();renderSuggestions('',true)}else closeSuggestions()});el.entry.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();el.stop.focus()}});el.stop.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();el.risk.focus()}});
+$('#copy').addEventListener('click',async()=>{await navigator.clipboard.writeText(el.note.textContent);$('#copy').textContent='Скопировано';setTimeout(()=>$('#copy').textContent='Скопировать расчёт',1200)});
+$('#reset').addEventListener('click',()=>{form.reset();current=instruments[0];instrument.value=displayCode(current);updateInstrumentInfo();el.entry.value=95000;el.stop.value=94000;setMode('percent',false)});
+try{const saved=JSON.parse(localStorage.getItem('aristocks-trader'));if(saved){el.account.value=saved.account||150000;el.risk.value=saved.risk||1;const radio=$(`[name="riskMode"][value="${saved.mode}"]`);if(radio){radio.checked=true;setMode(saved.mode,false)}}}catch{}
+async function loadStatic(){
+ try{
+  const response=await fetch('https://raw.githubusercontent.com/nikfury12/aristocks-futures-data/main/data/futures.json',{cache:'no-cache',signal:AbortSignal.timeout(6000)});
+  if(!response.ok)throw Error(`HTTP ${response.status}`);
+  const payload=await response.json(),list=Array.isArray(payload.contracts)?payload.contracts:[];
+  if(!list.length)throw Error('Empty contract list');
+  instruments=list;populate(list);
+  const updated=new Date(payload.updatedAt),stale=!Number.isFinite(updated.getTime())||Date.now()-updated.getTime()>86400000;
+  el.status.classList.toggle('ready',!stale);
+  el.status.lastChild.textContent=stale?' MOEX · данные устарели':` MOEX · ${updated.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}`;
+  el.status.title=stale?'Данные не обновлялись более суток':`Обновлено: ${updated.toLocaleString('ru-RU')}`;
+ }catch{
+  populate(fallback);el.status.classList.remove('ready');el.status.lastChild.textContent=' нет свежих данных';el.status.title='Не удалось загрузить справочник контрактов';
+ }
+}
+populate(fallback);loadStatic();
