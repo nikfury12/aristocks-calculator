@@ -3,7 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Быстрый расчёт позиции — Aristocks</title>
+  <title>Калькулятор фьючерсов MOEX — размер позиции | Аристокс</title>
+  <meta name="description" content="Бесплатный калькулятор фьючерсов Московской биржи: рассчитайте количество контрактов, убыток по стопу, гарантийное обеспечение и риск сделки.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://calc.aristocks.ru/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:site_name" content="Аристокс">
+  <meta property="og:title" content="Калькулятор фьючерсов MOEX — размер позиции">
+  <meta property="og:description" content="Рассчитайте количество контрактов, риск по стопу и требуемое гарантийное обеспечение перед сделкой.">
+  <meta property="og:url" content="https://calc.aristocks.ru/">
+  <meta name="theme-color" content="#f3f5f2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
@@ -11,14 +21,14 @@
 </head>
 <body>
   <header>
-    <a class="brand" href="index.html">АРИСТОКС</a>
+    <a class="brand" href="https://invest.aristocks.ru/">АРИСТОКС</a>
     <span id="data-status"><i></i> MOEX</span>
     <a class="telegram-link header-telegram" href="https://t.me/aristocks" target="_blank" rel="noopener">Telegram <span>↗</span></a>
   </header>
 
   <main>
     <div class="title-row">
-      <div><h1>Размер позиции</h1><p>Введите условия сделки. Расчёт появится сразу.</p></div>
+      <div><h1>Калькулятор фьючерсов MOEX</h1><p>Введите вход, стоп и допустимый риск — размер позиции появится сразу.</p></div>
       <button id="reset" type="button">Сбросить</button>
     </div>
 
@@ -89,11 +99,37 @@
         </div>
       </div>
     </section>
+    <section class="guide" aria-labelledby="guide-title">
+      <div class="guide-heading">
+        <span>Перед сделкой</span>
+        <h2 id="guide-title">Как рассчитать размер позиции по фьючерсу</h2>
+        <p>Калькулятор переводит расстояние до стопа в рубли и показывает, сколько контрактов укладывается в заданный риск. Так сделку можно сравнить с вашим лимитом до отправки заявки брокеру.</p>
+      </div>
+      <div class="guide-grid">
+        <article><span class="guide-number">01</span><h3>Выберите контракт</h3><p>Начните вводить код или название: например, <b>Si-9.26</b> или <b>SiU6</b>. Мы подставим шаг цены, стоимость шага, ГО и дату экспирации.</p></article>
+        <article><span class="guide-number">02</span><h3>Укажите вход и стоп</h3><p>Направление определяется автоматически. Чем дальше стоп от входа, тем меньше контрактов допустимо при том же риске.</p></article>
+        <article><span class="guide-number">03</span><h3>Задайте риск</h3><p>Можно указать процент от счёта или готовую сумму в рублях. Во втором случае размер счёта вводить не нужно.</p></article>
+      </div>
+      <div class="method">
+        <div><span>Что входит в результат</span><h2>Контракты, убыток по стопу и требуемое ГО</h2></div>
+        <p>Риск одного контракта считается по расстоянию между входом и стопом с учётом стоимости шага цены и заложенного резерва на исполнение. Количество контрактов округляется вниз, чтобы расчётный убыток не превышал выбранный лимит. Если указать цель, калькулятор дополнительно покажет потенциальный результат.</p>
+      </div>
+      <div class="faq">
+        <h2>Частые вопросы</h2>
+        <details><summary>Откуда берутся параметры фьючерсов?<span>+</span></summary><p>Шаг цены, стоимость шага, гарантийное обеспечение и дата экспирации загружаются из данных Московской биржи. При временной недоступности источника используется резервный набор данных.</p></details>
+        <details><summary>Почему калькулятор показывает ноль контрактов?<span>+</span></summary><p>Риск одного контракта больше установленного лимита. Можно увеличить допустимый риск или выбрать стоп ближе к точке входа, если это соответствует вашему торговому сценарию.</p></details>
+        <details><summary>Чем риск в процентах отличается от риска в рублях?<span>+</span></summary><p>При выборе процентов лимит рассчитывается от размера счёта. При выборе рублей используется введённая сумма, поэтому размер счёта не требуется.</p></details>
+        <details><summary>Можно ли использовать результат как торговую рекомендацию?<span>+</span></summary><p>Нет. Калькулятор выполняет справочный расчёт по введённым данным и не оценивает качество точки входа, ликвидность, волатильность или ваш личный уровень риска.</p></details>
+      </div>
+    </section>
     <footer class="utility-footer">
       <p>Расчёт справочный и не является индивидуальной инвестиционной рекомендацией.</p>
         <a href="https://t.me/aristocks_bot" target="_blank" rel="noopener">Нашли ошибку? Напишите нам ↗</a>
     </footer>
   </main>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Калькулятор фьючерсов MOEX","url":"https://calc.aristocks.ru/","description":"Расчёт размера позиции, риска по стопу и гарантийного обеспечения для фьючерсов Московской биржи.","applicationCategory":"FinanceApplication","operatingSystem":"Web","inLanguage":"ru","offers":{"@type":"Offer","price":"0","priceCurrency":"RUB"},"publisher":{"@type":"Organization","name":"Аристокс","url":"https://invest.aristocks.ru/"}}
+  </script>
   <script src="trader-calculator.js"></script>
 </body>
 </html>
