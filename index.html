@@ -1,51 +1,56 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Калькулятор фьючерсов MOEX — размер позиции | Аристокс</title>
-  <meta name="description" content="Бесплатный калькулятор фьючерсов Московской биржи: рассчитайте количество контрактов, убыток по стопу, гарантийное обеспечение и риск сделки.">
+  <title>Калькулятор фьючерсов MOEX — размер позиции и риск</title>
+  <meta name="description" content="Бесплатный калькулятор фьючерсов Московской биржи: рассчитает количество контрактов, размер позиции, риск по стоп-лоссу и требуемое гарантийное обеспечение.">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://calc.aristocks.ru/">
+  <link rel="canonical" href="https://invest.aristocks.ru/calc">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ru_RU">
   <meta property="og:site_name" content="Аристокс">
-  <meta property="og:title" content="Калькулятор фьючерсов MOEX — размер позиции">
-  <meta property="og:description" content="Рассчитайте количество контрактов, риск по стопу и требуемое гарантийное обеспечение перед сделкой.">
-  <meta property="og:url" content="https://calc.aristocks.ru/">
+  <meta property="og:title" content="Калькулятор фьючерсов MOEX — размер позиции и риск">
+  <meta property="og:description" content="Бесплатный калькулятор фьючерсов Московской биржи: рассчитает количество контрактов, размер позиции, риск по стоп-лоссу и требуемое гарантийное обеспечение.">
+  <meta property="og:url" content="https://invest.aristocks.ru/calc">
   <meta name="theme-color" content="#f3f5f2">
-  <link rel="stylesheet" href="trader-calculator.css?v=3">
+  <link rel="stylesheet" href="trader-calculator.css?v=11">
 </head>
 <body>
   <header>
     <a class="brand" href="https://invest.aristocks.ru/">АРИСТОКС</a>
-    <span id="data-status"><i></i> MOEX</span>
-    <a class="telegram-link header-telegram" href="https://t.me/aristocks" target="_blank" rel="noopener">Telegram <span>↗</span></a>
+    <span id="data-status"><i></i> Данные</span>
+    <nav class="header-socials" aria-label="Мы в сети">
+      <a class="telegram-link header-telegram social-primary" href="https://t.me/aristocks" target="_blank" rel="noopener">Telegram</a>
+      <a href="https://max.ru/id501007669220_biz" target="_blank" rel="noopener">MAX</a>
+      <a href="https://vk.ru/aristocks" target="_blank" rel="noopener">VK</a>
+    </nav>
   </header>
 
   <main>
     <div class="title-row">
-      <div><h1>Калькулятор фьючерсов MOEX</h1><p>Введите вход, стоп и допустимый риск — размер позиции появится сразу.</p></div>
-      <button id="reset" type="button">Сбросить</button>
+      <div><h1>Калькулятор фьючерсов MOEX</h1><p>Выберите контракт, укажите вход и стоп — получите количество контрактов, риск по стопу и требуемое ГО.</p></div>
     </div>
 
     <section class="calculator" aria-label="Быстрый расчёт позиции">
       <form id="trade-form" novalidate>
         <div class="field instrument-field">
-          <label for="instrument">Контракт</label>
+          <div class="instrument-heading"><label for="instrument">Контракт</label><button class="instrument-reset" id="reset" type="button">Сбросить</button></div>
           <div class="instrument-control">
-            <input id="instrument" name="instrument" role="combobox" aria-autocomplete="list" aria-controls="instrument-list" aria-expanded="false" autocomplete="off" spellcheck="false" placeholder="Si-9.26 или SiU6" value="Si-9.26">
+            <input id="instrument" name="instrument" role="combobox" aria-autocomplete="list" aria-controls="instrument-list" aria-expanded="false" autocomplete="off" spellcheck="false" placeholder="Si-9.26 или SiU6">
             <button id="instrument-toggle" type="button" tabindex="-1" aria-label="Показать контракты">⌄</button>
             <div id="instrument-list" class="instrument-list" role="listbox" hidden></div>
           </div>
-          <small id="instrument-meta">Доллар / рубль · экспирация 17.09.2026</small>
+          <small id="instrument-meta">Начните вводить код или название контракта</small>
           <strong id="expiry-warning" hidden></strong>
+          <small id="liquidity-status" class="liquidity-status" role="status" aria-live="polite" hidden></small>
         </div>
 
         <div class="pair prices">
-          <label class="field"><span>Вход</span><input id="entry" name="entry" type="number" value="95000" min="0" step="any" inputmode="decimal"></label>
-          <label class="field"><span>Стоп</span><input id="stop" name="stop" type="number" value="94000" min="0" step="any" inputmode="decimal"></label>
+          <label class="field"><span>Вход</span><input id="entry" class="grouped-number" name="entry" type="text" inputmode="decimal" placeholder="95 000"></label>
+          <label class="field"><span>Стоп</span><input id="stop" class="grouped-number" name="stop" type="text" inputmode="decimal" placeholder="94 000"></label>
         </div>
+        <p id="unit-risk" class="unit-risk" hidden><strong id="trade-direction"></strong><span id="unit-risk-value"></span></p>
 
         <div class="risk-head">
           <span>Риск</span>
@@ -57,35 +62,56 @@
         </div>
 
         <div class="pair risk-pair">
-          <label class="field" id="account-field"><span>Счёт</span><div><input id="account" name="account" type="number" value="150000" min="0" step="1000" inputmode="decimal"><b>₽</b></div></label>
-          <label class="field"><span>На сделку</span><div><input id="risk" name="risk" type="number" value="1" min="0" step="0.1" inputmode="decimal"><b id="risk-unit">%</b></div></label>
+          <label class="field" id="account-field"><span>Счёт</span><div><input id="account" class="grouped-number" name="account" type="text" inputmode="decimal" placeholder="150 000"><b>₽</b></div></label>
+          <label class="field"><span>На сделку</span><div><input id="risk" class="grouped-number" name="risk" type="text" inputmode="decimal" placeholder="1"><b id="risk-unit">%</b></div></label>
         </div>
+        <output id="risk-amount" class="risk-amount" aria-live="polite" hidden></output>
 
-        <details>
-          <summary>Есть цель сделки <span>+</span></summary>
-          <label class="field target-field"><span>Цель</span><input id="target" name="target" type="number" min="0" step="any" inputmode="decimal" placeholder="Необязательно"></label>
+        <details class="target-plan">
+          <summary>Цели и частичные выходы <span>+</span></summary>
+          <div id="manual-targets">
+            <div class="trade-target">
+              <label class="field"><span>Цена цели</span><input class="target-price grouped-number" type="text" inputmode="decimal" placeholder="Например, 97 000"></label>
+              <label class="field"><span>Выйти, контрактов</span><input class="target-qty" type="number" min="0" step="1" inputmode="numeric" placeholder="1"></label>
+              <button class="target-remove" type="button" aria-label="Удалить цель">×</button>
+              <output class="target-result">Введите цель и количество.</output>
+            </div>
+          </div>
+          <button id="add-target" class="add-target" type="button">+ Добавить цель</button>
+          <output id="targets-total" class="targets-total"></output>
         </details>
       </form>
 
       <aside class="answer" aria-live="polite">
-        <div class="answer-head"><span id="direction">Покупка</span><span id="state">Расчёт готов</span></div>
-        <div class="main-answer"><span>Открыть</span><strong id="contracts">1</strong><b id="contract-word">контракт</b></div>
+        <div class="answer-head"><span id="direction">Сделка</span><span id="state">Введите условия</span></div>
+        <div class="main-answer"><span>Открыть</span><strong id="contracts">—</strong><b id="contract-word">контрактов</b></div>
         <dl>
           <div class="primary"><dt>Убыток по стопу</dt><dd id="loss">—</dd></div>
-          <div><dt>Требуемое ГО</dt><dd id="margin">—</dd></div>
+          <div><dt>Нужно для открытия (ГО)</dt><dd id="margin">—</dd></div>
           <div><dt>Стоп</dt><dd id="stop-distance">—</dd></div>
-          <div id="profit-row" hidden><dt>Прибыль на цели</dt><dd id="profit">—</dd></div>
+          <div id="profit-row" hidden><dt>Результат по целям</dt><dd id="profit">—</dd><small id="profit-meta"></small></div>
         </dl>
-        <p id="note">Учитываем комиссию и проскальзывание.</p>
-        <button id="copy" type="button">Скопировать расчёт</button>
+        <p id="note">Введите вход, стоп и риск.</p>
+        <section class="risk-targets" aria-label="Цели по риску">
+          <button id="targets-toggle" class="targets-toggle" type="button" aria-expanded="false" aria-controls="targets-panel" disabled><span>Расчётные уровни 1R / 2R / 3R</span><b>+</b></button>
+          <div id="targets-panel" hidden>
+            <div class="targets-grid">
+              <div><span>1R · 1:1</span><strong id="target-1-price">—</strong><small id="target-1-profit">—</small></div>
+              <div><span>2R · 1:2</span><strong id="target-2-price">—</strong><small id="target-2-profit">—</small></div>
+              <div><span>3R · 1:3</span><strong id="target-3-price">—</strong><small id="target-3-profit">—</small></div>
+            </div>
+            <p>Уровни рассчитаны от расстояния до стопа. Возможное проскальзывание не учтено.</p>
+          </div>
+        </section>
+        <button id="copy" type="button" disabled>Скопировать расчёт</button>
       </aside>
     </section>
 
     <section class="about-strip" aria-label="Об Aristocks">
       <div class="about-mark" aria-hidden="true">A</div>
       <div class="about-copy">
-        <span>Инструмент Aristocks</span>
-        <p>Разбираем российский рынок: показываем не просто действие, а его логику и риски.</p>
+        <span>Бесплатный инструмент проекта Арины и Никиты Костюченко</span>
+        <p>Разбираем акции, облигации и фьючерсы: показываем логику решений и риски.</p>
       </div>
       <div class="about-proof"><strong>с 2019</strong><span>говорим о рынке</span></div>
       <div class="social-actions" aria-label="Каналы Aristocks">
@@ -100,7 +126,7 @@
       <div class="guide-heading">
         <span>Перед сделкой</span>
         <h2 id="guide-title">Как рассчитать размер позиции по фьючерсу</h2>
-        <p>Калькулятор переводит расстояние до стопа в рубли и показывает, сколько контрактов укладывается в заданный риск. Так сделку можно сравнить с вашим лимитом до отправки заявки брокеру.</p>
+        <p>Калькулятор рассчитывает размер позиции по фьючерсу: переводит расстояние до стопа в рубли и показывает, сколько контрактов укладывается в заданный риск.</p>
       </div>
       <div class="guide-grid">
         <article><span class="guide-number">01</span><h3>Выберите контракт</h3><p>Начните вводить код или название: например, <b>Si-9.26</b> или <b>SiU6</b>. Мы подставим шаг цены, стоимость шага, ГО и дату экспирации.</p></article>
@@ -108,15 +134,18 @@
         <article><span class="guide-number">03</span><h3>Задайте риск</h3><p>Можно указать процент от счёта или готовую сумму в рублях. Во втором случае размер счёта вводить не нужно.</p></article>
       </div>
       <div class="method">
-        <div><span>Что входит в результат</span><h2>Контракты, убыток по стопу и требуемое ГО</h2></div>
-        <p>Риск одного контракта считается по расстоянию между входом и стопом с учётом стоимости шага цены и заложенного резерва на исполнение. Количество контрактов округляется вниз, чтобы расчётный убыток не превышал выбранный лимит. Если указать цель, калькулятор дополнительно покажет потенциальный результат.</p>
+        <div><span>Что входит в результат</span><h2>Что рассчитывает калькулятор фьючерсов</h2></div>
+        <p>Риск одного контракта считается по расстоянию между входом и стопом с учётом стоимости шага цены. Количество контрактов округляется вниз, чтобы расчётный убыток не превышал выбранный лимит. Если указать цели, калькулятор дополнительно покажет потенциальный результат.</p>
       </div>
       <div class="faq">
         <h2>Частые вопросы</h2>
-        <details><summary>Откуда берутся параметры фьючерсов?<span>+</span></summary><p>Шаг цены, стоимость шага, гарантийное обеспечение и дата экспирации загружаются из данных Московской биржи. При временной недоступности источника используется резервный набор данных.</p></details>
-        <details><summary>Почему калькулятор показывает ноль контрактов?<span>+</span></summary><p>Риск одного контракта больше установленного лимита. Можно увеличить допустимый риск или выбрать стоп ближе к точке входа, если это соответствует вашему торговому сценарию.</p></details>
+        <details><summary>Как рассчитать количество фьючерсных контрактов?<span>+</span></summary><p>Допустимый риск делится на риск одного контракта. Риск одного контракта рассчитывается по расстоянию между входом и стопом, шагу цены и стоимости шага. Результат округляется вниз.</p></details>
+        <details><summary>Что такое гарантийное обеспечение фьючерса?<span>+</span></summary><p>Гарантийное обеспечение, или ГО, — сумма, необходимая для открытия позиции. Это не полная стоимость контракта и не максимальный возможный убыток. Калькулятор показывает требуемое ГО для рассчитанного количества контрактов.</p></details>
+        <details><summary>Как обновляются параметры контрактов?<span>+</span></summary><p>Шаг цены, стоимость шага, гарантийное обеспечение и дата экспирации обновляются автоматически из открытых рыночных данных. При временной недоступности источника используется последняя сохранённая версия.</p></details>
+        <details><summary>Почему калькулятор показывает ноль контрактов?<span>+</span></summary><p>Расчётный риск одного контракта превышает заданный лимит. Калькулятор не округляет количество вверх, поэтому показывает 0.</p></details>
         <details><summary>Чем риск в процентах отличается от риска в рублях?<span>+</span></summary><p>При выборе процентов лимит рассчитывается от размера счёта. При выборе рублей используется введённая сумма, поэтому размер счёта не требуется.</p></details>
-        <details><summary>Можно ли использовать результат как торговую рекомендацию?<span>+</span></summary><p>Нет. Калькулятор выполняет справочный расчёт по введённым данным и не оценивает качество точки входа, ликвидность, волатильность или ваш личный уровень риска.</p></details>
+        <details><summary>Проверяет ли калькулятор, хватает ли счёта на ГО?<span>+</span></summary><p>При риске в процентах количество контрактов ограничивается размером счёта и расчётным ГО. При риске в рублях размер счёта не вводится, поэтому калькулятор показывает требуемое ГО без проверки свободных средств.</p></details>
+          <details><summary>Можно ли использовать результат как торговую рекомендацию?<span>+</span></summary><p>Нет. Калькулятор выполняет справочный расчёт по введённым данным и не оценивает качество точки входа, будущую волатильность или ваш личный уровень риска.</p></details>
       </div>
     </section>
     <footer class="utility-footer">
@@ -125,8 +154,8 @@
     </footer>
   </main>
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebApplication","name":"Калькулятор фьючерсов MOEX","url":"https://calc.aristocks.ru/","description":"Расчёт размера позиции, риска по стопу и гарантийного обеспечения для фьючерсов Московской биржи.","applicationCategory":"FinanceApplication","operatingSystem":"Web","inLanguage":"ru","offers":{"@type":"Offer","price":"0","priceCurrency":"RUB"},"publisher":{"@type":"Organization","name":"Аристокс","url":"https://invest.aristocks.ru/"}}
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Калькулятор фьючерсов MOEX","url":"https://invest.aristocks.ru/calc","description":"Бесплатный калькулятор фьючерсов Московской биржи: рассчитает количество контрактов, размер позиции, риск по стоп-лоссу и требуемое гарантийное обеспечение.","applicationCategory":"FinanceApplication","operatingSystem":"Web","inLanguage":"ru","author":{"@type":"Person","name":"Арина и Никита Костюченко"},"publisher":{"@type":"Organization","name":"Aristocks","url":"https://invest.aristocks.ru/"},"isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"RUB"},"featureList":["Расчёт количества фьючерсных контрактов","Расчёт размера позиции","Расчёт риска по стоп-лоссу","Расчёт требуемого гарантийного обеспечения"]}
   </script>
-  <script src="trader-calculator.js?v=3"></script>
+  <script src="trader-calculator.js?v=11"></script>
 </body>
 </html>
