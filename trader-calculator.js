@@ -6,6 +6,9 @@ const builtInFallback=[
 const rawFallback=Array.isArray(window.ARISTOCKS_FUTURES_FALLBACK)&&window.ARISTOCKS_FUTURES_FALLBACK.length?window.ARISTOCKS_FUTURES_FALLBACK:builtInFallback;
 const appRoot=window.ARISTOCKS_CALCULATOR_ROOT||document;
 const $=s=>appRoot.querySelector(s),form=$('#trade-form'),instrument=$('#instrument'),instrumentList=$('#instrument-list');
+const menuButton=$('.menu-toggle'),siteNavigation=$('.site-nav');
+menuButton?.addEventListener('click',()=>{const open=menuButton.getAttribute('aria-expanded')==='true';menuButton.setAttribute('aria-expanded',String(!open));siteNavigation?.classList.toggle('open',!open)});
+siteNavigation?.addEventListener('click',()=>{menuButton?.setAttribute('aria-expanded','false');siteNavigation.classList.remove('open')});
 const el={entry:$('#entry'),stop:$('#stop'),account:$('#account'),risk:$('#risk'),accountField:$('#account-field'),riskPair:$('.risk-pair'),riskUnit:$('#risk-unit'),riskAmount:$('#risk-amount'),unitRisk:$('#unit-risk'),unitRiskValue:$('#unit-risk-value'),tradeDirection:$('#trade-direction'),contracts:$('#contracts'),word:$('#contract-word'),direction:$('#direction'),state:$('#state'),loss:$('#loss'),margin:$('#margin'),distance:$('#stop-distance'),profit:$('#profit'),profitRow:$('#profit-row'),profitMeta:$('#profit-meta'),note:$('#note'),copy:$('#copy'),answer:$('.answer'),status:$('#data-status'),instrumentMeta:$('#instrument-meta'),expiryWarning:$('#expiry-warning'),liquidity:$('#liquidity-status'),targetsToggle:$('#targets-toggle'),targetsLabel:$('#targets-toggle span'),targetsPanel:$('#targets-panel'),manualTargets:$('#manual-targets'),targetsTotal:$('#targets-total'),addTarget:$('#add-target')};
 const riskTargets=[1,2,3].map(r=>({r,price:$(`#target-${r}-price`),profit:$(`#target-${r}-profit`)}));
 let instruments=[],current=null,liquidityRequest=0,targetContext=null;
