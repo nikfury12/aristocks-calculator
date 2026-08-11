@@ -19,7 +19,7 @@
 <body>
   <header>
     <a class="brand" href="https://invest.aristocks.ru/">АРИСТОКС</a>
-    <span id="data-status"><i></i> Данные</span>
+    <span id="data-status" role="status" aria-live="polite" aria-atomic="true"><i aria-hidden="true"></i> Данные</span>
     <nav class="header-socials" aria-label="Мы в сети">
       <a class="telegram-link header-telegram social-primary" href="https://t.me/aristocks" target="_blank" rel="noopener">Telegram</a>
       <a href="https://max.ru/id501007669220_biz" target="_blank" rel="noopener">MAX</a>
@@ -37,8 +37,8 @@
         <div class="field instrument-field">
           <div class="instrument-heading"><label for="instrument">Контракт</label><button class="instrument-reset" id="reset" type="button">Сбросить</button></div>
           <div class="instrument-control">
-            <input id="instrument" name="instrument" role="combobox" aria-autocomplete="list" aria-controls="instrument-list" aria-expanded="false" autocomplete="off" spellcheck="false" placeholder="Si-9.26 или SiU6">
-            <button id="instrument-toggle" type="button" tabindex="-1" aria-label="Показать контракты">⌄</button>
+            <input id="instrument" name="instrument" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="instrument-list" aria-expanded="false" aria-describedby="instrument-meta expiry-warning liquidity-status note" autocomplete="off" spellcheck="false" placeholder="Si-9.26 или SiU6">
+            <button id="instrument-toggle" type="button" aria-label="Показать контракты" aria-controls="instrument-list" aria-expanded="false">⌄</button>
             <div id="instrument-list" class="instrument-list" role="listbox" hidden></div>
           </div>
           <small id="instrument-meta">Начните вводить код или название контракта</small>
@@ -47,8 +47,8 @@
         </div>
 
         <div class="pair prices">
-          <label class="field"><span>Вход</span><input id="entry" class="grouped-number" name="entry" type="text" inputmode="decimal" placeholder="95 000"></label>
-          <label class="field"><span>Стоп</span><input id="stop" class="grouped-number" name="stop" type="text" inputmode="decimal" placeholder="94 000"></label>
+          <label class="field"><span>Вход</span><input id="entry" class="grouped-number" name="entry" type="text" inputmode="decimal" aria-describedby="unit-risk note" placeholder="95 000"></label>
+          <label class="field"><span>Стоп</span><input id="stop" class="grouped-number" name="stop" type="text" inputmode="decimal" aria-describedby="unit-risk note" placeholder="94 000"></label>
         </div>
         <p id="unit-risk" class="unit-risk" hidden><strong id="trade-direction"></strong><span id="unit-risk-value"></span></p>
 
@@ -56,33 +56,33 @@
           <span>Риск</span>
           <fieldset>
             <legend class="sr-only">Единица риска</legend>
-            <label><input type="radio" name="riskMode" value="percent" checked><span>%</span></label>
-            <label><input type="radio" name="riskMode" value="rubles"><span>₽</span></label>
+            <label><input type="radio" name="riskMode" value="percent" aria-label="Процент от счёта" checked><span aria-hidden="true">%</span></label>
+            <label><input type="radio" name="riskMode" value="rubles" aria-label="Сумма в рублях"><span aria-hidden="true">₽</span></label>
           </fieldset>
         </div>
 
         <div class="pair risk-pair">
-          <label class="field" id="account-field"><span>Счёт</span><div><input id="account" class="grouped-number" name="account" type="text" inputmode="decimal" placeholder="150 000"><b>₽</b></div></label>
-          <label class="field"><span>На сделку</span><div><input id="risk" class="grouped-number" name="risk" type="text" inputmode="decimal" placeholder="1"><b id="risk-unit">%</b></div></label>
+          <label class="field" id="account-field"><span>Счёт</span><div><input id="account" class="grouped-number" name="account" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="150 000"><b aria-hidden="true">₽</b></div></label>
+          <label class="field"><span>На сделку</span><div><input id="risk" class="grouped-number" name="risk" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="1"><b id="risk-unit" aria-hidden="true">%</b></div></label>
         </div>
         <output id="risk-amount" class="risk-amount" aria-live="polite" hidden></output>
 
         <details class="target-plan">
-          <summary>Цели и частичные выходы <span>+</span></summary>
+          <summary>Цели и частичные выходы <span aria-hidden="true">+</span></summary>
           <div id="manual-targets">
             <div class="trade-target">
-              <label class="field"><span>Цена цели</span><input class="target-price grouped-number" type="text" inputmode="decimal" placeholder="Например, 97 000"></label>
-              <label class="field"><span>Выйти, контрактов</span><input class="target-qty" type="number" min="0" step="1" inputmode="numeric" placeholder="1"></label>
+              <label class="field"><span>Цена цели</span><input class="target-price grouped-number" type="text" inputmode="decimal" aria-describedby="target-result-0" placeholder="Например, 97 000"></label>
+              <label class="field"><span>Выйти, контрактов</span><input class="target-qty" type="number" min="0" step="1" inputmode="numeric" aria-describedby="target-result-0" placeholder="1"></label>
               <button class="target-remove" type="button" aria-label="Удалить цель">×</button>
-              <output class="target-result">Введите цель и количество.</output>
+              <output id="target-result-0" class="target-result" role="status" aria-live="polite">Введите цель и количество.</output>
             </div>
           </div>
           <button id="add-target" class="add-target" type="button">+ Добавить цель</button>
-          <output id="targets-total" class="targets-total"></output>
+          <output id="targets-total" class="targets-total" role="status" aria-live="polite"></output>
         </details>
       </form>
 
-      <aside class="answer" aria-live="polite">
+      <aside class="answer">
         <div class="answer-head"><span id="direction">Сделка</span><span id="state">Введите условия</span></div>
         <div class="main-answer"><span>Открыть</span><strong id="contracts">—</strong><b id="contract-word">контрактов</b></div>
         <dl>
@@ -91,9 +91,9 @@
           <div><dt>Стоп</dt><dd id="stop-distance">—</dd></div>
           <div id="profit-row" hidden><dt>Результат по целям</dt><dd id="profit">—</dd><small id="profit-meta"></small></div>
         </dl>
-        <p id="note">Введите вход, стоп и риск.</p>
+        <p id="note" role="status" aria-live="polite" aria-atomic="true">Введите вход, стоп и риск.</p>
         <section class="risk-targets" aria-label="Цели по риску">
-          <button id="targets-toggle" class="targets-toggle" type="button" aria-expanded="false" aria-controls="targets-panel" disabled><span>Расчётные уровни 1R / 2R / 3R</span><b>+</b></button>
+          <button id="targets-toggle" class="targets-toggle" type="button" aria-expanded="false" aria-controls="targets-panel" aria-describedby="note" disabled><span>Расчётные уровни 1R / 2R / 3R</span><b aria-hidden="true">+</b></button>
           <div id="targets-panel" hidden>
             <div class="targets-grid">
               <div><span>1R · 1:1</span><strong id="target-1-price">—</strong><small id="target-1-profit">—</small></div>
@@ -103,7 +103,7 @@
             <p>Уровни рассчитаны от расстояния до стопа. Возможное проскальзывание не учтено.</p>
           </div>
         </section>
-        <button id="copy" type="button" disabled>Скопировать расчёт</button>
+        <button id="copy" type="button" aria-describedby="note" disabled>Скопировать расчёт</button>
       </aside>
     </section>
 
@@ -139,13 +139,13 @@
       </div>
       <div class="faq">
         <h2>Частые вопросы</h2>
-        <details><summary>Как рассчитать количество фьючерсных контрактов?<span>+</span></summary><p>Допустимый риск делится на риск одного контракта. Риск одного контракта рассчитывается по расстоянию между входом и стопом, шагу цены и стоимости шага. Результат округляется вниз.</p></details>
-        <details><summary>Что такое гарантийное обеспечение фьючерса?<span>+</span></summary><p>Гарантийное обеспечение, или ГО, — сумма, необходимая для открытия позиции. Это не полная стоимость контракта и не максимальный возможный убыток. Калькулятор показывает требуемое ГО для рассчитанного количества контрактов.</p></details>
-        <details><summary>Как обновляются параметры контрактов?<span>+</span></summary><p>Шаг цены, стоимость шага, гарантийное обеспечение и дата экспирации обновляются автоматически из открытых рыночных данных. При временной недоступности источника используется последняя сохранённая версия.</p></details>
-        <details><summary>Почему калькулятор показывает ноль контрактов?<span>+</span></summary><p>Расчётный риск одного контракта превышает заданный лимит. Калькулятор не округляет количество вверх, поэтому показывает 0.</p></details>
-        <details><summary>Чем риск в процентах отличается от риска в рублях?<span>+</span></summary><p>При выборе процентов лимит рассчитывается от размера счёта. При выборе рублей используется введённая сумма, поэтому размер счёта не требуется.</p></details>
-        <details><summary>Проверяет ли калькулятор, хватает ли счёта на ГО?<span>+</span></summary><p>При риске в процентах количество контрактов ограничивается размером счёта и расчётным ГО. При риске в рублях размер счёта не вводится, поэтому калькулятор показывает требуемое ГО без проверки свободных средств.</p></details>
-          <details><summary>Можно ли использовать результат как торговую рекомендацию?<span>+</span></summary><p>Нет. Калькулятор выполняет справочный расчёт по введённым данным и не оценивает качество точки входа, будущую волатильность или ваш личный уровень риска.</p></details>
+        <details><summary>Как рассчитать количество фьючерсных контрактов?<span aria-hidden="true">+</span></summary><p>Допустимый риск делится на риск одного контракта. Риск одного контракта рассчитывается по расстоянию между входом и стопом, шагу цены и стоимости шага. Результат округляется вниз.</p></details>
+        <details><summary>Что такое гарантийное обеспечение фьючерса?<span aria-hidden="true">+</span></summary><p>Гарантийное обеспечение, или ГО, — сумма, необходимая для открытия позиции. Это не полная стоимость контракта и не максимальный возможный убыток. Калькулятор показывает требуемое ГО для рассчитанного количества контрактов.</p></details>
+        <details><summary>Как обновляются параметры контрактов?<span aria-hidden="true">+</span></summary><p>Шаг цены, стоимость шага, гарантийное обеспечение и дата экспирации обновляются автоматически из открытых рыночных данных. При временной недоступности источника используется последняя сохранённая версия.</p></details>
+        <details><summary>Почему калькулятор показывает ноль контрактов?<span aria-hidden="true">+</span></summary><p>Расчётный риск одного контракта превышает заданный лимит. Калькулятор не округляет количество вверх, поэтому показывает 0.</p></details>
+        <details><summary>Чем риск в процентах отличается от риска в рублях?<span aria-hidden="true">+</span></summary><p>При выборе процентов лимит рассчитывается от размера счёта. При выборе рублей используется введённая сумма, поэтому размер счёта не требуется.</p></details>
+        <details><summary>Проверяет ли калькулятор, хватает ли счёта на ГО?<span aria-hidden="true">+</span></summary><p>При риске в процентах количество контрактов ограничивается размером счёта и расчётным ГО. При риске в рублях размер счёта не вводится, поэтому калькулятор показывает требуемое ГО без проверки свободных средств.</p></details>
+          <details><summary>Можно ли использовать результат как торговую рекомендацию?<span aria-hidden="true">+</span></summary><p>Нет. Калькулятор выполняет справочный расчёт по введённым данным и не оценивает качество точки входа, будущую волатильность или ваш личный уровень риска.</p></details>
       </div>
     </section>
     <footer class="utility-footer">

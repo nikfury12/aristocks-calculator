@@ -1,17 +1,14 @@
 import { readFile, writeFile } from 'node:fs/promises';
+import { transform } from 'esbuild';
 
 const embedPath = new URL('../tilda-calculator-embed.html', import.meta.url);
 const indexPath = new URL('../index.html', import.meta.url);
-const appPath = new URL('../.tilda-script-output.js', import.meta.url);
+const appPath = new URL('../trader-calculator.js', import.meta.url);
 
 let embed = await readFile(embedPath, 'utf8');
 const index = await readFile(indexPath, 'utf8');
-let app = null;
-try {
-  app = (await readFile(appPath, 'utf8')).trim();
-} catch (error) {
-  if (error?.code !== 'ENOENT') throw error;
-}
+const appSource = await readFile(appPath, 'utf8');
+const app = (await transform(appSource, { loader: 'js', minify: true, target: 'es2020', charset: 'utf8', legalComments: 'none' })).code.trim();
 
 const schemaStart = index.indexOf('  <script type="application/ld+json">');
 const schemaEnd = index.indexOf('  </script>', schemaStart);
@@ -52,14 +49,27 @@ if (!embed.includes('id="aristocks-direction-css"')) {
   embed = embed.slice(0, insertAt) + directionCss + embed.slice(insertAt);
 }
 
-if (app) {
-  const scriptStart = embed.lastIndexOf('<script>');
-  const scriptEnd = embed.indexOf('</script>', scriptStart);
-  if (scriptStart < 0 || scriptEnd < 0) throw new Error('Calculator app script not found in Tilda embed');
-  const finalScript = `(()=>{${app}})();`;
-  new Function(finalScript);
-  embed = embed.slice(0, scriptStart) + `<script>${finalScript}\n` + embed.slice(scriptEnd);
+const toggleCss = '<style id="aristocks-toggle-css">#aristocks-calculator .instrument-control>button{top:0;bottom:0;height:auto;display:block;padding:0;font-size:0}#aristocks-calculator .instrument-control>button::before{content:"";position:absolute;left:50%;top:50%;width:12px;height:8px;border:0;background:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'8\' viewBox=\'0 0 12 8\'%3E%3Cpath d=\'M1 1l5 5 5-5\' fill=\'none\' stroke=\'%2325302d\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") center/12px 8px no-repeat;transform:translate(-50%,-50%)}</style>';
+embed = embed.replace(/<style id="aristocks-toggle-css">[\s\S]*?<\/style>/, toggleCss);
+if (!embed.includes('id="aristocks-toggle-css"')) {
+  const insertAt = embed.indexOf('<div id="aristocks-calculator">');
+  embed = embed.slice(0, insertAt) + toggleCss + embed.slice(insertAt);
 }
 
+const accessibilityCss = '<style id="aristocks-accessibility-css">#aristocks-calculator .field input:focus-visible,#aristocks-calculator .field select:focus-visible{outline:3px solid #c68138;outline-offset:2px}#aristocks-calculator .risk-head input:focus-visible+span{outline:3px solid #c68138;outline-offset:2px}#aristocks-calculator .field input[aria-invalid="true"]{border-color:var(--red)}#aristocks-calculator .instrument-field small,#aristocks-calculator .unit-risk{color:#59625f}#aristocks-calculator .answer .risk-targets #targets-panel>p{color:rgba(255,255,255,.55)}#aristocks-calculator .utility-footer{color:#59625f}</style>';
+embed = embed.replace(/<style id="aristocks-accessibility-css">[\s\S]*?<\/style>/, accessibilityCss);
+if (!embed.includes('id="aristocks-accessibility-css"')) {
+  const insertAt = embed.indexOf('<div id="aristocks-calculator">');
+  embed = embed.slice(0, insertAt) + accessibilityCss + embed.slice(insertAt);
+}
+
+const scriptStart = embed.lastIndexOf('<script>');
+const scriptEnd = embed.indexOf('</script>', scriptStart);
+if (scriptStart < 0 || scriptEnd < 0) throw new Error('Calculator app script not found in Tilda embed');
+const fallbackDecoder = `if(window.ARISTOCKS_FUTURES_FALLBACK_GZIP&&typeof DecompressionStream!=='undefined'){try{const bytes=Uint8Array.from(atob(window.ARISTOCKS_FUTURES_FALLBACK_GZIP),char=>char.charCodeAt(0));const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip')),rows=JSON.parse(await new Response(stream).text());window.ARISTOCKS_FUTURES_FALLBACK=rows.map(([secid,name,assetCode,expiry,minStep,stepPrice,margin])=>({secid,name,assetCode,expiry,minStep,stepPrice,margin}))}catch{}}`;
+const finalScript = `(async()=>{if(!document.documentElement.lang)document.documentElement.lang='ru';${fallbackDecoder}${app}})();`;
+new Function(finalScript);
+embed = embed.slice(0, scriptStart) + `<script>${finalScript}\n` + embed.slice(scriptEnd);
+
 await writeFile(embedPath, embed, 'utf8');
-console.log(JSON.stringify({ bytes: Buffer.byteLength(embed), rootChars: root.length, appChars: app?.length ?? 0, appPreserved: !app }));
+console.log(JSON.stringify({ bytes: Buffer.byteLength(embed), rootChars: root.length, appChars: app.length }));
