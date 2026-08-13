@@ -47,8 +47,8 @@
         </div>
 
         <div class="pair prices">
-          <label class="field"><span>Вход</span><input id="entry" class="grouped-number" name="entry" type="text" inputmode="decimal" aria-describedby="unit-risk note" placeholder="Например, 95 000"></label>
-          <label class="field"><span>Стоп</span><input id="stop" class="grouped-number" name="stop" type="text" inputmode="decimal" aria-describedby="unit-risk note" placeholder="Например, 94 000"></label>
+          <label class="field"><span>Вход</span><input id="entry" class="grouped-number" name="entry" type="text" inputmode="decimal" aria-describedby="unit-risk note" placeholder="95 000"></label>
+          <label class="field"><span>Стоп</span><input id="stop" class="grouped-number" name="stop" type="text" inputmode="decimal" aria-describedby="unit-risk note" placeholder="94 000"></label>
         </div>
         <p id="unit-risk" class="unit-risk" hidden><strong id="trade-direction"></strong><span id="unit-risk-value"></span></p>
 
@@ -63,7 +63,7 @@
 
         <div class="pair risk-pair rubles">
           <label class="field" id="account-field" hidden><span>Счёт</span><div><input id="account" class="grouped-number" name="account" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="150 000"><b aria-hidden="true">₽</b></div></label>
-          <label class="field"><span id="risk-label">Максимальный убыток</span><div><input id="risk" class="grouped-number" name="risk" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="Например, 1 500"><b id="risk-unit" aria-hidden="true">₽</b></div></label>
+          <label class="field"><span id="risk-label">Максимальный убыток</span><div><input id="risk" class="grouped-number" name="risk" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="1 500"><b id="risk-unit" aria-hidden="true">₽</b></div></label>
         </div>
         <output id="risk-amount" class="risk-amount" aria-live="polite" hidden></output>
 
@@ -71,7 +71,7 @@
           <summary>Цели и частичные выходы <span aria-hidden="true">+</span></summary>
           <div id="manual-targets">
             <div class="trade-target">
-              <label class="field"><span>Цена цели</span><input class="target-price grouped-number" type="text" inputmode="decimal" aria-describedby="target-result-0" placeholder="Например, 97 000"></label>
+              <label class="field"><span>Цена цели</span><input class="target-price grouped-number" type="text" inputmode="decimal" aria-describedby="target-result-0" placeholder="97 000"></label>
               <label class="field"><span>Выйти, контрактов</span><input class="target-qty" type="number" min="0" step="1" inputmode="numeric" aria-describedby="target-result-0" placeholder="1"></label>
               <button class="target-remove" type="button" aria-label="Удалить цель">×</button>
               <output id="target-result-0" class="target-result" role="status" aria-live="polite">Введите цель и количество.</output>

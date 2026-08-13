@@ -56,11 +56,18 @@ if (!embed.includes('id="aristocks-toggle-css"')) {
   embed = embed.slice(0, insertAt) + toggleCss + embed.slice(insertAt);
 }
 
-const accessibilityCss = '<style id="aristocks-accessibility-css">#aristocks-calculator :focus-visible{outline-color:var(--violet)}#aristocks-calculator .field input::placeholder{color:#858d8a}#aristocks-calculator .prices input::placeholder{font-size:13px}#aristocks-calculator .field input:focus-visible,#aristocks-calculator .field select:focus-visible{outline:3px solid var(--violet);outline-offset:2px}#aristocks-calculator .risk-head label span{width:auto;min-width:78px;height:32px;padding:0 10px;font-size:9px}#aristocks-calculator .risk-head label+label span{min-width:67px}#aristocks-calculator .risk-head input:focus-visible+span{outline:3px solid var(--violet);outline-offset:2px}#aristocks-calculator .field input[aria-invalid="true"]{border-color:var(--red)}#aristocks-calculator .instrument-field small,#aristocks-calculator .unit-risk{color:#59625f}#aristocks-calculator .answer .risk-targets #targets-panel>p{color:rgba(255,255,255,.55)}#aristocks-calculator .utility-footer{color:#59625f}</style>';
+const accessibilityCss = '<style id="aristocks-accessibility-css">#aristocks-calculator :focus-visible{outline-color:var(--violet)}#aristocks-calculator .field input::placeholder{color:#858d8a}#aristocks-calculator .field input:focus-visible,#aristocks-calculator .field select:focus-visible{outline:3px solid var(--violet);outline-offset:2px}#aristocks-calculator .risk-head label span{width:auto;min-width:78px;height:32px;padding:0 10px;font-size:9px}#aristocks-calculator .risk-head label+label span{min-width:67px}#aristocks-calculator .risk-head input:focus-visible+span{outline:3px solid var(--violet);outline-offset:2px}#aristocks-calculator .field input[aria-invalid="true"]{border-color:var(--red)}#aristocks-calculator .instrument-field small,#aristocks-calculator .unit-risk{color:#59625f}#aristocks-calculator .answer .risk-targets #targets-panel>p{color:rgba(255,255,255,.55)}#aristocks-calculator .utility-footer{color:#59625f}</style>';
 embed = embed.replace(/<style id="aristocks-accessibility-css">[\s\S]*?<\/style>/, accessibilityCss);
 if (!embed.includes('id="aristocks-accessibility-css"')) {
   const insertAt = embed.indexOf('<div id="aristocks-calculator">');
   embed = embed.slice(0, insertAt) + accessibilityCss + embed.slice(insertAt);
+}
+
+const aboutMobileCss = '<style id="aristocks-about-mobile-css">#aristocks-calculator .prices input::placeholder{font-size:inherit}@media(max-width:720px){#aristocks-calculator .about-strip{margin:12px 16px 0;padding:18px 16px;grid-template-columns:38px minmax(0,1fr);align-items:start;column-gap:14px;row-gap:16px}#aristocks-calculator .about-copy{min-width:0}#aristocks-calculator .about-copy span{display:block;font-size:8px;line-height:1.45;letter-spacing:.07em}#aristocks-calculator .about-copy p{margin-top:8px;font-size:10px;line-height:1.55}#aristocks-calculator .about-proof{grid-column:1/-1;padding:13px 0 0;display:flex;align-items:baseline;gap:8px;border-top:1px solid var(--line);border-left:0}#aristocks-calculator .social-actions{grid-column:1/-1;width:100%;min-width:0}}</style>';
+embed = embed.replace(/<style id="aristocks-about-mobile-css">[\s\S]*?<\/style>/, aboutMobileCss);
+if (!embed.includes('id="aristocks-about-mobile-css"')) {
+  const insertAt = embed.indexOf('<div id="aristocks-calculator">');
+  embed = embed.slice(0, insertAt) + aboutMobileCss + embed.slice(insertAt);
 }
 
 const scriptStart = embed.lastIndexOf('<script>');
