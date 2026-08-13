@@ -56,14 +56,14 @@
           <span>Риск</span>
           <fieldset>
             <legend class="sr-only">Единица риска</legend>
-            <label><input type="radio" name="riskMode" value="percent" aria-label="Процент от счёта" checked><span aria-hidden="true">%</span></label>
-            <label><input type="radio" name="riskMode" value="rubles" aria-label="Сумма в рублях"><span aria-hidden="true">₽</span></label>
+            <label><input type="radio" name="riskMode" value="percent" aria-label="Процент от счёта"><span aria-hidden="true">%</span></label>
+            <label><input type="radio" name="riskMode" value="rubles" aria-label="Сумма в рублях" checked><span aria-hidden="true">₽</span></label>
           </fieldset>
         </div>
 
-        <div class="pair risk-pair">
-          <label class="field" id="account-field"><span>Счёт</span><div><input id="account" class="grouped-number" name="account" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="150 000"><b aria-hidden="true">₽</b></div></label>
-          <label class="field"><span>На сделку</span><div><input id="risk" class="grouped-number" name="risk" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="1"><b id="risk-unit" aria-hidden="true">%</b></div></label>
+        <div class="pair risk-pair rubles">
+          <label class="field" id="account-field" hidden><span>Счёт</span><div><input id="account" class="grouped-number" name="account" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="150 000"><b aria-hidden="true">₽</b></div></label>
+          <label class="field"><span>На сделку</span><div><input id="risk" class="grouped-number" name="risk" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="1 500"><b id="risk-unit" aria-hidden="true">₽</b></div></label>
         </div>
         <output id="risk-amount" class="risk-amount" aria-live="polite" hidden></output>
 

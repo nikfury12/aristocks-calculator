@@ -42,7 +42,7 @@ if (!embed.includes('id="aristocks-header-css"')) {
   embed = embed.slice(0, insertAt) + headerCss + embed.slice(insertAt);
 }
 
-const directionCss = '<style id="aristocks-direction-css">#aristocks-calculator .unit-risk:not([hidden]){display:flex;align-items:center;gap:10px}#aristocks-calculator .unit-risk strong{font:600 10px/1 var(--mono);letter-spacing:.06em}#aristocks-calculator .unit-risk[data-direction="long"] strong{color:var(--green)}#aristocks-calculator .unit-risk[data-direction="short"] strong{color:var(--red)}#aristocks-calculator .risk-amount{display:block;margin:9px 0 -8px;color:#59625f;font:500 10px/1.4 var(--mono)}#aristocks-calculator .risk-amount[hidden]{display:none}</style>';
+const directionCss = '<style id="aristocks-direction-css">#aristocks-calculator .unit-risk{padding:8px 10px;border-left:2px solid var(--violet);color:#38413f;background:#f7f5ff}#aristocks-calculator .unit-risk:not([hidden]){display:flex;align-items:center;gap:10px}#aristocks-calculator .unit-risk strong{font:600 10px/1 var(--mono);letter-spacing:.06em}#aristocks-calculator #unit-risk-value{font-weight:600}#aristocks-calculator .unit-risk[data-direction="long"] strong{color:var(--green)}#aristocks-calculator .unit-risk[data-direction="short"] strong{color:var(--red)}#aristocks-calculator .risk-amount{display:block;margin:9px 0 -8px;color:#59625f;font:500 10px/1.4 var(--mono)}#aristocks-calculator .risk-amount[hidden]{display:none}</style>';
 embed = embed.replace(/<style id="aristocks-direction-css">[\s\S]*?<\/style>/, directionCss);
 if (!embed.includes('id="aristocks-direction-css"')) {
   const insertAt = embed.indexOf('<div id="aristocks-calculator">');
