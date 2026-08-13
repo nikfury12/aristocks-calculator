@@ -37,18 +37,18 @@
         <div class="field instrument-field">
           <div class="instrument-heading"><label for="instrument">Контракт</label><button class="instrument-reset" id="reset" type="button">Сбросить</button></div>
           <div class="instrument-control">
-            <input id="instrument" name="instrument" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="instrument-list" aria-expanded="false" aria-describedby="instrument-meta expiry-warning liquidity-status note" autocomplete="off" spellcheck="false" placeholder="Si-9.26 или SiU6">
+            <input id="instrument" name="instrument" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="instrument-list" aria-expanded="false" aria-describedby="instrument-meta expiry-warning liquidity-status note" autocomplete="off" spellcheck="false" placeholder="Si, SiU6 или Si-9.26">
             <button id="instrument-toggle" type="button" aria-label="Показать контракты" aria-controls="instrument-list" aria-expanded="false">⌄</button>
             <div id="instrument-list" class="instrument-list" role="listbox" hidden></div>
           </div>
-          <small id="instrument-meta">Начните вводить код или название контракта</small>
+          <small id="instrument-meta">Введите тикер или откройте список популярных контрактов</small>
           <strong id="expiry-warning" hidden></strong>
           <small id="liquidity-status" class="liquidity-status" role="status" aria-live="polite" hidden></small>
         </div>
 
         <div class="pair prices">
-          <label class="field"><span>Вход</span><input id="entry" class="grouped-number" name="entry" type="text" inputmode="decimal" aria-describedby="unit-risk note" placeholder="95 000"></label>
-          <label class="field"><span>Стоп</span><input id="stop" class="grouped-number" name="stop" type="text" inputmode="decimal" aria-describedby="unit-risk note" placeholder="94 000"></label>
+          <label class="field"><span>Вход</span><input id="entry" class="grouped-number" name="entry" type="text" inputmode="decimal" aria-describedby="unit-risk note" placeholder="Например, 95 000"></label>
+          <label class="field"><span>Стоп</span><input id="stop" class="grouped-number" name="stop" type="text" inputmode="decimal" aria-describedby="unit-risk note" placeholder="Например, 94 000"></label>
         </div>
         <p id="unit-risk" class="unit-risk" hidden><strong id="trade-direction"></strong><span id="unit-risk-value"></span></p>
 
@@ -56,14 +56,14 @@
           <span>Риск</span>
           <fieldset>
             <legend class="sr-only">Единица риска</legend>
-            <label><input type="radio" name="riskMode" value="percent" aria-label="Процент от счёта"><span aria-hidden="true">%</span></label>
-            <label><input type="radio" name="riskMode" value="rubles" aria-label="Сумма в рублях" checked><span aria-hidden="true">₽</span></label>
+            <label><input type="radio" name="riskMode" value="percent" aria-label="Процент от счёта"><span aria-hidden="true">% От счёта</span></label>
+            <label><input type="radio" name="riskMode" value="rubles" aria-label="Сумма в рублях" checked><span aria-hidden="true">₽ Рубли</span></label>
           </fieldset>
         </div>
 
         <div class="pair risk-pair rubles">
           <label class="field" id="account-field" hidden><span>Счёт</span><div><input id="account" class="grouped-number" name="account" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="150 000"><b aria-hidden="true">₽</b></div></label>
-          <label class="field"><span>На сделку</span><div><input id="risk" class="grouped-number" name="risk" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="1 500"><b id="risk-unit" aria-hidden="true">₽</b></div></label>
+          <label class="field"><span id="risk-label">Максимальный убыток</span><div><input id="risk" class="grouped-number" name="risk" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="Например, 1 500"><b id="risk-unit" aria-hidden="true">₽</b></div></label>
         </div>
         <output id="risk-amount" class="risk-amount" aria-live="polite" hidden></output>
 
