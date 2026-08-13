@@ -77,6 +77,13 @@ if (!embed.includes('id="aristocks-instrument-list-css"')) {
   embed = embed.slice(0, insertAt) + instrumentListCss + embed.slice(insertAt);
 }
 
+const resultJumpCss = '<style id="aristocks-result-jump-css">#aristocks-calculator .result-jump{display:none}@media(max-width:720px){#aristocks-calculator .result-jump:not([hidden]){width:100%;min-height:48px;margin-top:18px;padding:0 15px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--violet);color:#fff;background:var(--violet);font:600 11px/1.2 var(--body);cursor:pointer}#aristocks-calculator .result-jump b{font:500 10px/1 var(--mono);text-transform:uppercase;letter-spacing:.04em}#aristocks-calculator .result-jump:focus-visible{outline:3px solid #25302d;outline-offset:2px}}</style>';
+embed = embed.replace(/<style id="aristocks-result-jump-css">[\s\S]*?<\/style>/, resultJumpCss);
+if (!embed.includes('id="aristocks-result-jump-css"')) {
+  const insertAt = embed.indexOf('<div id="aristocks-calculator">');
+  embed = embed.slice(0, insertAt) + resultJumpCss + embed.slice(insertAt);
+}
+
 const scriptStart = embed.lastIndexOf('<script>');
 const scriptEnd = embed.indexOf('</script>', scriptStart);
 if (scriptStart < 0 || scriptEnd < 0) throw new Error('Calculator app script not found in Tilda embed');

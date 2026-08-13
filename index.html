@@ -80,9 +80,10 @@
           <button id="add-target" class="add-target" type="button">+ Добавить цель</button>
           <output id="targets-total" class="targets-total" role="status" aria-live="polite"></output>
         </details>
+        <button id="result-jump" class="result-jump" type="button" aria-controls="calculation-result" hidden><span>Расчёт готов</span><b>Показать ↓</b></button>
       </form>
 
-      <aside class="answer">
+      <aside class="answer" id="calculation-result">
         <div class="answer-head"><span id="direction">Сделка</span><span id="state">Введите условия</span></div>
         <div class="main-answer"><span>Открыть</span><strong id="contracts">—</strong><b id="contract-word">контрактов</b></div>
         <dl>
