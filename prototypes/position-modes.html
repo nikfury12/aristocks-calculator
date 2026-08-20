@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Прототип режимов калькулятора — Aristocks</title>
+  <style>
+    @font-face{font-family:Golos;src:url(../fonts/golos-cyrillic.woff2) format("woff2");font-weight:400 700}
+    @font-face{font-family:PlexMono;src:url(../fonts/plex-500-cyrillic.woff2) format("woff2");font-weight:500}
+    :root{--paper:#f3f5f2;--white:#fff;--ink:#14201d;--muted:#65706c;--line:#d5dcd8;--violet:#5b3fd6;--green:#169575;--mint:#79e3c4;--red:#ff9389;--amber:#fff0ca}
+    *{box-sizing:border-box}
+    html{background:var(--paper);color:var(--ink);font-family:Golos,Arial,sans-serif}
+    body{margin:0}
+    button,input{font:inherit}
+    button{color:inherit}
+    .prototype{min-height:100vh;background:linear-gradient(rgba(20,32,29,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(20,32,29,.035) 1px,transparent 1px),var(--paper);background-size:64px 64px}
+    .topbar{height:82px;display:flex;align-items:center;justify-content:space-between;padding:0 max(24px,calc((100vw - 1240px)/2));border-bottom:1px solid var(--line);background:rgba(243,245,242,.94)}
+    .logo{color:var(--violet);font-size:29px;letter-spacing:-.055em}
+    .prototype-badge{font:500 10px/1 PlexMono,monospace;letter-spacing:.09em;text-transform:uppercase}
+    .prototype-badge::before{content:"";display:inline-block;width:8px;height:8px;margin-right:9px;border-radius:50%;background:#c58a1a}
+    main{width:min(1240px,calc(100% - 40px));margin:44px auto 80px}
+    .intro{display:flex;align-items:end;justify-content:space-between;gap:30px;margin-bottom:20px}
+    h1{margin:0;font-size:35px;line-height:1.05;letter-spacing:-.045em}
+    .intro p{max-width:610px;margin:10px 0 0;color:var(--muted);font-size:14px;line-height:1.55}
+    .reset{padding:5px 0;border:0;border-bottom:1px solid #8d9692;background:none;color:var(--muted);cursor:pointer}
+    .mode-shell{padding:18px;border:1px solid var(--line);background:rgba(255,255,255,.62)}
+    .mode-label{margin:0 0 10px;font-size:11px;font-weight:700}
+    .mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .mode{min-height:72px;padding:14px 16px;display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;border:1px solid var(--line);background:var(--white);text-align:left;cursor:pointer}
+    .mode[aria-pressed="true"]{border-color:var(--violet);box-shadow:inset 4px 0 0 var(--violet);background:#f5f2ff}
+    .mode-index{font:500 10px/1.4 PlexMono,monospace;color:var(--violet)}
+    .mode strong{display:block;font-size:13px}
+    .mode small{display:block;margin-top:5px;color:var(--muted);font-size:11px;line-height:1.35}
+    .workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(470px,1.06fr);border:1px solid var(--line);border-top:0;background:var(--white)}
+    .form{padding:34px}
+    .result{padding:34px 38px;color:#fff;background:var(--ink)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .field{margin-bottom:22px}
+    .field label,.section-title{display:block;margin-bottom:8px;font-size:11px;font-weight:700}
+    .control{position:relative}
+    input{width:100%;height:64px;padding:0 16px;border:1px solid var(--line);outline:0;background:#fbfcfb;color:var(--ink);font:500 22px/1 PlexMono,monospace}
+    input:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(91,63,214,.13)}
+    input::placeholder{color:#8a938f}
+    .suffix{position:absolute;right:15px;top:50%;transform:translateY(-50%);color:var(--muted);font:500 11px/1 PlexMono,monospace;pointer-events:none}
+    .contract{height:64px;width:100%;padding:0 16px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);background:#fbfcfb;cursor:pointer;text-align:left}
+    .contract strong{font:500 16px/1 PlexMono,monospace}
+    .contract small{color:var(--muted);font:400 10px/1.3 PlexMono,monospace}
+    .contract-note{margin-top:7px;color:var(--muted);font-size:10px}
+    .direction{margin:-8px 0 22px;padding:9px 11px;border-left:2px solid var(--violet);background:#f5f2ff;font:500 10px/1.3 PlexMono,monospace}
+    .direction b{margin-right:12px;color:var(--green)}
+    .mode-only[hidden]{display:none}
+    .optional{color:var(--muted);font-weight:400}
+    .helper{margin:7px 0 0;color:var(--muted);font-size:10px;line-height:1.4}
+    .exits{margin-top:8px;padding-top:22px;border-top:1px solid var(--line)}
+    .exits-head{display:flex;align-items:center;justify-content:space-between}
+    .exits-head button{border:0;background:none;color:var(--violet);font-size:20px;cursor:pointer}
+    .exit-row{display:grid;grid-template-columns:1fr 150px 28px;gap:10px;align-items:end;margin-top:12px}
+    .exit-row .field{margin:0}
+    .remove{height:64px;border:0;background:none;color:#76817d;cursor:pointer;font-size:20px}
+    .exit-result{grid-column:1/-1;margin-top:-3px;color:var(--green);font:500 10px/1.3 PlexMono,monospace}
+    .add-exit{margin-top:15px;padding:6px 0;border:0;border-bottom:1px solid rgba(91,63,214,.4);background:none;color:var(--violet);font-size:11px;cursor:pointer}
+    .result-head{display:flex;justify-content:space-between;padding-bottom:21px;border-bottom:1px solid rgba(255,255,255,.13);font:500 10px/1 PlexMono,monospace;letter-spacing:.08em;text-transform:uppercase}
+    .result-head span:last-child{color:var(--mint)}
+    .primary-result{padding:30px 0}
+    .primary-result small{display:block;color:#9ea9a5;font-size:12px}
+    .primary-line{display:flex;align-items:end;gap:12px;margin-top:6px}
+    .primary-line strong{font-size:72px;line-height:.9;letter-spacing:-.06em}
+    .primary-line span{padding-bottom:8px;font-size:13px;font-weight:700}
+    .metrics{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(255,255,255,.13);border-bottom:1px solid rgba(255,255,255,.13)}
+    .metric{min-height:104px;padding:20px 0}
+    .metric:nth-child(odd){padding-right:24px;border-right:1px solid rgba(255,255,255,.13)}
+    .metric:nth-child(even){padding-left:24px}
+    .metric:nth-child(n+3){border-top:1px solid rgba(255,255,255,.13)}
+    .metric dt{color:#9ea9a5;font-size:10px}
+    .metric dd{margin:8px 0 0;font:500 19px/1.25 PlexMono,monospace}
+    .metric dd.loss{color:var(--red)}
+    .metric dd.profit{color:var(--mint)}
+    .exposure{margin-top:22px;padding:18px 20px;border:1px solid rgba(121,227,196,.35);background:rgba(121,227,196,.06)}
+    .exposure-title{display:flex;justify-content:space-between;align-items:center;color:var(--mint);font:500 10px/1 PlexMono,monospace;text-transform:uppercase;letter-spacing:.08em}
+    .exposure-grid{display:grid;grid-template-columns:1fr 1fr 1fr;margin-top:17px}
+    .exposure-grid div+div{padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
+    .exposure-grid small{display:block;color:#9ea9a5;font-size:9px}
+    .exposure-grid strong{display:block;margin-top:7px;font:500 15px/1.3 PlexMono,monospace}
+    .result-note{margin-top:22px;color:#9ea9a5;font-size:11px;line-height:1.5}
+    .empty-rr{color:#9ea9a5!important;font-size:12px!important;font-family:Golos,Arial,sans-serif!important}
+    .concept-note{margin-top:18px;padding:14px 16px;border:1px dashed #b8c0bd;color:var(--muted);font-size:11px;line-height:1.5;background:rgba(255,255,255,.55)}
+    @media(max-width:800px){
+      .topbar{height:68px;padding:0 18px}.logo{font-size:24px}.prototype-badge{font-size:8px}
+      main{width:100%;margin:0}.intro{padding:25px 18px 16px}.intro h1{font-size:27px}.intro p{font-size:12px}.reset{align-self:start}
+      .mode-shell{padding:12px;border-left:0;border-right:0}.mode-switch{grid-template-columns:1fr}.mode{min-height:62px}
+      .workspace{grid-template-columns:1fr;border-left:0;border-right:0}.form{padding:25px 18px}.result{padding:28px 18px}
+      .row{gap:10px}.exit-row{grid-template-columns:1fr 115px 24px}.primary-line strong{font-size:62px}
+      .exposure-grid{grid-template-columns:1fr}.exposure-grid div+div{margin-top:13px;padding:13px 0 0;border-left:0;border-top:1px solid rgba(255,255,255,.12)}
+      .concept-note{margin:18px}
+    }
+    @media(max-width:430px){.intro{align-items:start}.intro p{max-width:280px}.row{grid-template-columns:1fr}.field{margin-bottom:18px}.exit-row{grid-template-columns:1fr 105px 24px}.metrics{grid-template-columns:1fr}.metric:nth-child(n){padding:18px 0;border-right:0}.metric+ .metric{border-top:1px solid rgba(255,255,255,.13)}}
+  </style>
+</head>
+<body>
+  <div class="prototype" id="prototype">
+    <header class="topbar">
+      <div class="logo">АРИСТОКС</div>
+      <div class="prototype-badge">интерактивный прототип</div>
+    </header>
+    <main>
+      <div class="intro">
+        <div>
+          <h1>Калькулятор позиции</h1>
+          <p>Сначала выберите, что нужно узнать: допустимое количество контрактов или параметры уже заданной позиции.</p>
+        </div>
+        <button class="reset" type="button" id="reset">Сбросить</button>
+      </div>
+
+      <section class="mode-shell" aria-labelledby="mode-label">
+        <p class="mode-label" id="mode-label">Что посчитать?</p>
+        <div class="mode-switch">
+          <button class="mode" type="button" data-mode="risk" aria-pressed="true">
+            <span class="mode-index">01</span>
+            <span><strong>Рассчитать количество</strong><small>Укажу вход, стоп и допустимый риск</small></span>
+          </button>
+          <button class="mode" type="button" data-mode="quantity" aria-pressed="false">
+            <span class="mode-index">02</span>
+            <span><strong>Указать количество</strong><small>Проверю риск, ГО и результат позиции</small></span>
+          </button>
+        </div>
+      </section>
+
+      <section class="workspace" aria-live="polite">
+        <div class="form">
+          <div class="field">
+            <label>Контракт</label>
+            <button class="contract" type="button"><strong>Si-9.26 · SiU6</strong><small>экспирация 17.09.2026&nbsp;&nbsp;⌄</small></button>
+            <div class="contract-note">Доллар США — российский рубль</div>
+          </div>
+
+          <div class="row">
+            <div class="field"><label for="entry">Вход</label><div class="control"><input id="entry" inputmode="decimal" value="95000"><span class="suffix">п.</span></div></div>
+            <div class="field"><label for="stop">Стоп <span class="optional" id="stop-optional"></span></label><div class="control"><input id="stop" inputmode="decimal" value="94000" placeholder="не указан"><span class="suffix">п.</span></div><p class="helper" id="stop-helper">Нужен для расчёта количества и R/R.</p></div>
+          </div>
+          <div class="direction"><b id="direction">ЛОНГ</b><span id="per-contract">Риск на 1 контракт: 1 000 ₽</span></div>
+
+          <div class="mode-only" data-for="risk">
+            <div class="field"><label for="risk">Максимальный убыток по сделке</label><div class="control"><input id="risk" inputmode="decimal" value="1500"><span class="suffix">₽</span></div><p class="helper">Количество округляется вниз и не превышает заданный риск.</p></div>
+          </div>
+          <div class="mode-only" data-for="quantity" hidden>
+            <div class="field"><label for="quantity">Контрактов в позиции</label><div class="control"><input id="quantity" inputmode="numeric" value="2"><span class="suffix">шт.</span></div><p class="helper">Можно указать фактическое количество открытых контрактов.</p></div>
+          </div>
+
+          <section class="exits" aria-labelledby="exits-title">
+            <div class="exits-head"><span class="section-title" id="exits-title">Точки выхода</span><button type="button" id="toggle-exits" aria-expanded="true">×</button></div>
+            <div id="exit-list">
+              <div class="exit-row">
+                <div class="field"><label>Цена выхода</label><div class="control"><input class="exit-price" inputmode="decimal" value="97000"><span class="suffix">п.</span></div></div>
+                <div class="field"><label>Контрактов</label><input class="exit-qty" inputmode="numeric" value="1"></div>
+                <button class="remove" type="button" aria-label="Удалить точку выхода">×</button>
+                <div class="exit-result"></div>
+              </div>
+              <div class="exit-row">
+                <div class="field"><label>Цена выхода</label><div class="control"><input class="exit-price" inputmode="decimal" value="93500"><span class="suffix">п.</span></div></div>
+                <div class="field"><label>Контрактов</label><input class="exit-qty" inputmode="numeric" value="1"></div>
+                <button class="remove" type="button" aria-label="Удалить точку выхода">×</button>
+                <div class="exit-result"></div>
+              </div>
+            </div>
+            <button class="add-exit" type="button" id="add-exit">+ Добавить точку выхода</button>
+          </section>
+        </div>
+
+        <aside class="result" id="calculation-result">
+          <div class="result-head"><span>Сделка</span><span>Расчёт готов</span></div>
+          <div class="primary-result"><small id="primary-label">Открыть</small><div class="primary-line"><strong id="primary-value">1</strong><span id="primary-unit">контракт</span></div></div>
+          <dl class="metrics">
+            <div class="metric"><dt>Убыток по стопу</dt><dd class="loss" id="stop-loss">1 000 ₽</dd></div>
+            <div class="metric"><dt>Нужно для открытия (ГО)</dt><dd id="margin">13 181 ₽</dd></div>
+            <div class="metric"><dt>Результат точек выхода</dt><dd class="profit" id="exit-total">+500 ₽</dd></div>
+            <div class="metric"><dt>Итоговый риск / результат</dt><dd id="rr">+0,50R</dd></div>
+          </dl>
+          <section class="exposure">
+            <div class="exposure-title"><span>Размер позиции</span><span>не сумма списания</span></div>
+            <div class="exposure-grid">
+              <div><small>Номинал позиции</small><strong id="notional">95 000 ₽</strong></div>
+              <div><small>ГО</small><strong id="margin-small">13 181 ₽</strong></div>
+              <div><small>Плечо по ГО</small><strong id="leverage">≈ 7,2×</strong></div>
+            </div>
+          </section>
+          <p class="result-note" id="result-note">Номинал показывает рыночный размер позиции. Для открытия блокируется ГО, которое может отличаться у брокера.</p>
+        </aside>
+      </section>
+
+      <div class="concept-note"><strong>Хедж не включён в эту форму.</strong> Расчёт хеджа требует отдельного выбора портфеля, инструмента и доли покрытия; простого процента от стоимости портфеля недостаточно для точного результата.</div>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+      const state = { mode: 'risk', marginPerContract: 13180.61, stepValue: 1 };
+      const number = (value) => Number(String(value).replace(/\s/g, '').replace(',', '.')) || 0;
+      const money = (value, sign = false) => `${sign && value > 0 ? '+' : ''}${Math.round(value).toLocaleString('ru-RU')} ₽`;
+      const plural = (qty) => qty % 10 === 1 && qty % 100 !== 11 ? 'контракт' : qty % 10 >= 2 && qty % 10 <= 4 && !(qty % 100 >= 12 && qty % 100 <= 14) ? 'контракта' : 'контрактов';
+
+      function calculate() {
+        const entry = number($('#entry').value);
+        const stop = number($('#stop').value);
+        const riskLimit = number($('#risk').value);
+        const specifiedQty = Math.max(0, Math.floor(number($('#quantity').value)));
+        const riskPerContract = stop ? Math.abs(entry - stop) * state.stepValue : 0;
+        const qty = state.mode === 'risk' ? (riskPerContract ? Math.floor(riskLimit / riskPerContract) : 0) : specifiedQty;
+        const stopLoss = riskPerContract * qty;
+        const direction = !stop || entry >= stop ? 1 : -1;
+        let exitTotal = 0;
+
+        $$('.exit-row').forEach((row) => {
+          const price = number($('.exit-price', row).value);
+          const exitQty = Math.max(0, Math.floor(number($('.exit-qty', row).value)));
+          const result = (price - entry) * state.stepValue * exitQty * direction;
+          exitTotal += result;
+          $('.exit-result', row).textContent = price && exitQty ? `${money(result, true)} · ${result < 0 ? 'выход с убытком' : 'прибыль'}` : 'Укажите цену и количество';
+          $('.exit-result', row).style.color = result < 0 ? 'var(--red)' : 'var(--green)';
+        });
+
+        $('#direction').textContent = direction > 0 ? 'ЛОНГ' : 'ШОРТ';
+        $('#per-contract').textContent = stop ? `Риск на 1 контракт: ${money(riskPerContract)}` : 'Стоп не указан — риск и R/R не рассчитываются';
+        $('#primary-label').textContent = state.mode === 'risk' ? 'Открыть' : 'В позиции';
+        $('#primary-value').textContent = qty.toLocaleString('ru-RU');
+        $('#primary-unit').textContent = plural(qty);
+        $('#stop-loss').textContent = stop ? money(stopLoss) : 'Стоп не указан';
+        $('#stop-loss').className = stop ? 'loss' : 'empty-rr';
+        const totalMargin = state.marginPerContract * qty;
+        $('#margin').textContent = money(totalMargin);
+        $('#margin-small').textContent = money(totalMargin);
+        $('#exit-total').textContent = money(exitTotal, true);
+        $('#exit-total').className = exitTotal < 0 ? 'loss' : 'profit';
+        $('#rr').textContent = stopLoss ? `${exitTotal >= 0 ? '+' : ''}${(exitTotal / stopLoss).toLocaleString('ru-RU', {maximumFractionDigits: 2})}R` : 'Нужен стоп';
+        $('#rr').className = stopLoss ? (exitTotal < 0 ? 'loss' : 'profit') : 'empty-rr';
+        const notional = entry * qty;
+        $('#notional').textContent = money(notional);
+        $('#leverage').textContent = totalMargin ? `≈ ${(notional / totalMargin).toLocaleString('ru-RU', {maximumFractionDigits: 1})}×` : '—';
+      }
+
+      function setMode(mode) {
+        state.mode = mode;
+        $$('.mode').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
+        $$('.mode-only').forEach((block) => block.hidden = block.dataset.for !== mode);
+        const quantityMode = mode === 'quantity';
+        $('#stop-optional').textContent = quantityMode ? '· необязательно' : '';
+        $('#stop-helper').textContent = quantityMode ? 'Без стопа покажем прибыль и убыток по выходам, но не R/R.' : 'Нужен для расчёта количества и R/R.';
+        calculate();
+      }
+
+      function addExit() {
+        const row = document.createElement('div');
+        row.className = 'exit-row';
+        row.innerHTML = '<div class="field"><label>Цена выхода</label><div class="control"><input class="exit-price" inputmode="decimal" placeholder="96 500"><span class="suffix">п.</span></div></div><div class="field"><label>Контрактов</label><input class="exit-qty" inputmode="numeric" value="1"></div><button class="remove" type="button" aria-label="Удалить точку выхода">×</button><div class="exit-result">Укажите цену и количество</div>';
+        $('#exit-list').append(row);
+        $('.exit-price', row).focus();
+      }
+
+      $$('.mode').forEach((button) => button.addEventListener('click', () => setMode(button.dataset.mode)));
+      $('#prototype').addEventListener('input', (event) => { if (event.target.matches('input')) calculate(); });
+      $('#add-exit').addEventListener('click', addExit);
+      $('#exit-list').addEventListener('click', (event) => { if (event.target.matches('.remove')) { event.target.closest('.exit-row').remove(); calculate(); } });
+      $('#toggle-exits').addEventListener('click', () => {
+        const list = $('#exit-list');
+        const hidden = list.hidden;
+        list.hidden = !hidden;
+        $('#add-exit').hidden = !hidden;
+        $('#toggle-exits').textContent = hidden ? '×' : '+';
+        $('#toggle-exits').setAttribute('aria-expanded', String(hidden));
+      });
+      $('#reset').addEventListener('click', () => {
+        $('#entry').value = '95000'; $('#stop').value = '94000'; $('#risk').value = '1500'; $('#quantity').value = '2'; setMode('risk');
+      });
+      calculate();
+    })();
+  </script>
+</body>
+</html>
