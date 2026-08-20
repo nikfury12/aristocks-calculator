@@ -62,8 +62,8 @@
           <label class="field"><span>Количество контрактов</span><input id="position-quantity" name="positionQuantity" type="number" min="1" step="1" inputmode="numeric" placeholder="1"></label>
           <fieldset class="direction-choice">
             <legend>Направление</legend>
-            <label><input type="radio" name="positionDirection" value="BUY" checked><span>Покупка</span></label>
-            <label><input type="radio" name="positionDirection" value="SELL"><span>Продажа</span></label>
+            <label><input type="radio" name="positionDirection" value="BUY" checked><span>Лонг</span></label>
+            <label><input type="radio" name="positionDirection" value="SELL"><span>Шорт</span></label>
           </fieldset>
         </div>
 
@@ -106,7 +106,6 @@
         <dl>
           <div class="primary"><dt>Убыток по стопу</dt><dd id="loss">—</dd></div>
           <div><dt>Нужно для открытия (ГО)</dt><dd id="margin">—</dd></div>
-          <div><dt>Стоп</dt><dd id="stop-distance">—</dd></div>
           <div id="profit-row" hidden><dt>Прибыль / убыток по выходам</dt><dd id="profit">—</dd><small id="profit-meta"></small></div>
         </dl>
         <p id="note" role="status" aria-live="polite" aria-atomic="true">Введите вход, стоп и риск.</p>
@@ -114,7 +113,6 @@
           <h2>Позиция и обеспечение</h2>
           <dl>
             <div><dt>Позиция на сумму</dt><dd id="notional">—</dd></div>
-            <div><dt>Заблокируется ГО</dt><dd id="position-margin">—</dd></div>
             <div><dt>Расчётное плечо</dt><dd id="leverage">—</dd></div>
           </dl>
           <p>Стоимость позиции рассчитана по цене входа. Для открытия блокируется ГО; у брокера оно может отличаться.</p>
