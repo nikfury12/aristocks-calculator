@@ -91,7 +91,7 @@ if (!embed.includes('id="aristocks-modes-css"')) {
   embed = embed.slice(0, insertAt) + modesCss + embed.slice(insertAt);
 }
 
-const readabilityCss = '<style id="aristocks-readability-css">#aristocks-calculator .target-result{font-size:12px}#aristocks-calculator .targets-total{font-size:13px}#aristocks-calculator .answer #profit-row small{font-size:11px}</style>';
+const readabilityCss = '<style id="aristocks-readability-css">#aristocks-calculator .target-result{font-size:12px}#aristocks-calculator .targets-total{font-size:11px;font-weight:500;line-height:1.6}#aristocks-calculator .answer #profit-row small{font-size:11px}#aristocks-calculator .calculation-mode legend{font-size:11px}#aristocks-calculator .calculation-mode span{min-height:64px}#aristocks-calculator .calculation-mode b{font-size:13px}#aristocks-calculator .calculation-mode small{font-size:11px;line-height:1.45}@media(max-width:720px){#aristocks-calculator .calculation-mode span{min-height:60px}#aristocks-calculator .calculation-mode b{font-size:13px}#aristocks-calculator .calculation-mode small{font-size:11px}#aristocks-calculator .targets-total{font-size:11px}}</style>';
 embed = embed.replace(/<style id="aristocks-readability-css">[\s\S]*?<\/style>/, readabilityCss);
 if (!embed.includes('id="aristocks-readability-css"')) {
   const insertAt = embed.indexOf('<div id="aristocks-calculator">');
