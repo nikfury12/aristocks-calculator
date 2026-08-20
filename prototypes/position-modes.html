@@ -106,21 +106,21 @@
       <div class="intro">
         <div>
           <h1>Калькулятор позиции</h1>
-          <p>Сначала выберите, что нужно узнать: допустимое количество контрактов или параметры уже заданной позиции.</p>
+          <p>Калькулятор может подобрать количество контрактов по допустимому риску или посчитать уже заданную позицию.</p>
         </div>
         <button class="reset" type="button" id="reset">Сбросить</button>
       </div>
 
       <section class="mode-shell" aria-labelledby="mode-label">
-        <p class="mode-label" id="mode-label">Что посчитать?</p>
+        <p class="mode-label" id="mode-label">Как рассчитать позицию?</p>
         <div class="mode-switch">
           <button class="mode" type="button" data-mode="risk" aria-pressed="true">
             <span class="mode-index">01</span>
-            <span><strong>Рассчитать количество</strong><small>Укажу вход, стоп и допустимый риск</small></span>
+            <span><strong>Подобрать количество по риску</strong><small>Калькулятор определит количество по входу, стопу и допустимому убытку</small></span>
           </button>
           <button class="mode" type="button" data-mode="quantity" aria-pressed="false">
             <span class="mode-index">02</span>
-            <span><strong>Указать количество</strong><small>Проверю риск, ГО и результат позиции</small></span>
+            <span><strong>Посчитать заданную позицию</strong><small>Калькулятор посчитает риск и итог для указанного количества контрактов</small></span>
           </button>
         </div>
       </section>
@@ -172,18 +172,18 @@
           <dl class="metrics">
             <div class="metric"><dt>Убыток по стопу</dt><dd class="loss" id="stop-loss">1 000 ₽</dd></div>
             <div class="metric"><dt>Нужно для открытия (ГО)</dt><dd id="margin">13 181 ₽</dd></div>
-            <div class="metric"><dt>Результат точек выхода</dt><dd class="profit" id="exit-total">+500 ₽</dd></div>
-            <div class="metric"><dt>Итоговый риск / результат</dt><dd id="rr">+0,50R</dd></div>
+            <div class="metric"><dt>Прибыль / убыток по выходам</dt><dd class="profit" id="exit-total">+500 ₽</dd></div>
+            <div class="metric"><dt>Результат относительно риска</dt><dd id="rr">+0,50R</dd></div>
           </dl>
           <section class="exposure">
-            <div class="exposure-title"><span>Размер позиции</span><span>не сумма списания</span></div>
+            <div class="exposure-title"><span>Позиция и обеспечение</span></div>
             <div class="exposure-grid">
-              <div><small>Номинал позиции</small><strong id="notional">95 000 ₽</strong></div>
-              <div><small>ГО</small><strong id="margin-small">13 181 ₽</strong></div>
-              <div><small>Плечо по ГО</small><strong id="leverage">≈ 7,2×</strong></div>
+              <div><small>Позиция на сумму</small><strong id="notional">95 000 ₽</strong></div>
+              <div><small>Заблокируется ГО</small><strong id="margin-small">13 181 ₽</strong></div>
+              <div><small>Расчётное плечо</small><strong id="leverage">≈ 7,2×</strong></div>
             </div>
           </section>
-          <p class="result-note" id="result-note">Номинал показывает рыночный размер позиции. Для открытия блокируется ГО, которое может отличаться у брокера.</p>
+          <p class="result-note" id="result-note">«Позиция на сумму» — стоимость всех контрактов по цене входа. Для открытия на счёте блокируется ГО; у брокера оно может отличаться.</p>
         </aside>
       </section>
 
