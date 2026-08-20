@@ -29,11 +29,17 @@
 
   <main>
     <div class="title-row">
-      <div><h1>Калькулятор фьючерсов MOEX</h1><p>Выберите контракт, укажите вход и стоп — получите количество контрактов, риск по стопу и требуемое ГО.</p></div>
+      <div><h1>Калькулятор фьючерсов MOEX</h1><p>Посчитайте количество по заданному риску или проверьте риск и результат уже выбранной позиции.</p></div>
     </div>
 
     <section class="calculator" aria-label="Быстрый расчёт позиции">
       <form id="trade-form" novalidate>
+        <fieldset class="calculation-mode">
+          <legend>Что нужно посчитать?</legend>
+          <label><input type="radio" name="calculationMode" value="risk" checked><span><b>Количество по риску</b><small>Вход, стоп и допустимый убыток</small></span></label>
+          <label><input type="radio" name="calculationMode" value="position"><span><b>Риск и итог позиции</b><small>По заданному количеству контрактов</small></span></label>
+        </fieldset>
+
         <div class="field instrument-field">
           <div class="instrument-heading"><label for="instrument">Контракт</label><button class="instrument-reset" id="reset" type="button">Сбросить</button></div>
           <div class="instrument-control">
@@ -48,36 +54,47 @@
 
         <div class="pair prices">
           <label class="field"><span>Вход</span><input id="entry" class="grouped-number" name="entry" type="text" inputmode="decimal" aria-describedby="unit-risk note" placeholder="95 000"></label>
-          <label class="field"><span>Стоп</span><input id="stop" class="grouped-number" name="stop" type="text" inputmode="decimal" aria-describedby="unit-risk note" placeholder="94 000"></label>
+          <label class="field"><span>Стоп <small id="stop-optional" hidden>необязательно</small></span><input id="stop" class="grouped-number" name="stop" type="text" inputmode="decimal" aria-describedby="unit-risk note" placeholder="94 000"></label>
         </div>
         <p id="unit-risk" class="unit-risk" hidden><strong id="trade-direction"></strong><span id="unit-risk-value"></span></p>
 
-        <div class="risk-head">
-          <span>Риск</span>
-          <fieldset>
-            <legend class="sr-only">Единица риска</legend>
-            <label><input type="radio" name="riskMode" value="percent" aria-label="Процент от счёта"><span aria-hidden="true">% От счёта</span></label>
-            <label><input type="radio" name="riskMode" value="rubles" aria-label="Сумма в рублях" checked><span aria-hidden="true">₽ Рубли</span></label>
+        <div id="position-controls" class="position-controls" hidden>
+          <label class="field"><span>Количество контрактов</span><input id="position-quantity" name="positionQuantity" type="number" min="1" step="1" inputmode="numeric" placeholder="1"></label>
+          <fieldset class="direction-choice">
+            <legend>Направление</legend>
+            <label><input type="radio" name="positionDirection" value="BUY" checked><span>Покупка</span></label>
+            <label><input type="radio" name="positionDirection" value="SELL"><span>Продажа</span></label>
           </fieldset>
         </div>
 
-        <div class="pair risk-pair rubles">
-          <label class="field" id="account-field" hidden><span>Счёт</span><div><input id="account" class="grouped-number" name="account" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="150 000"><b aria-hidden="true">₽</b></div></label>
-          <label class="field"><span id="risk-label">Максимальный убыток</span><div><input id="risk" class="grouped-number" name="risk" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="1 500"><b id="risk-unit" aria-hidden="true">₽</b></div></label>
+        <div id="risk-controls">
+          <div class="risk-head">
+            <span>Риск</span>
+            <fieldset>
+              <legend class="sr-only">Единица риска</legend>
+              <label><input type="radio" name="riskMode" value="percent" aria-label="Процент от счёта"><span aria-hidden="true">% От счёта</span></label>
+              <label><input type="radio" name="riskMode" value="rubles" aria-label="Сумма в рублях" checked><span aria-hidden="true">₽ Рубли</span></label>
+            </fieldset>
+          </div>
+
+          <div class="pair risk-pair rubles">
+            <label class="field" id="account-field" hidden><span>Счёт</span><div><input id="account" class="grouped-number" name="account" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="150 000"><b aria-hidden="true">₽</b></div></label>
+            <label class="field"><span id="risk-label">Максимальный убыток</span><div><input id="risk" class="grouped-number" name="risk" type="text" inputmode="decimal" aria-describedby="risk-amount note" placeholder="1 500"><b id="risk-unit" aria-hidden="true">₽</b></div></label>
+          </div>
+          <output id="risk-amount" class="risk-amount" aria-live="polite" hidden></output>
         </div>
-        <output id="risk-amount" class="risk-amount" aria-live="polite" hidden></output>
 
         <details class="target-plan">
-          <summary>Цели и частичные выходы <span aria-hidden="true">+</span></summary>
+          <summary>Точки выхода <span aria-hidden="true">+</span></summary>
           <div id="manual-targets">
             <div class="trade-target">
-              <label class="field"><span>Цена цели</span><input class="target-price grouped-number" type="text" inputmode="decimal" aria-describedby="target-result-0" placeholder="97 000"></label>
-              <label class="field"><span>Выйти, контрактов</span><input class="target-qty" type="number" min="0" step="1" inputmode="numeric" aria-describedby="target-result-0" placeholder="1"></label>
-              <button class="target-remove" type="button" aria-label="Удалить цель">×</button>
-              <output id="target-result-0" class="target-result" role="status" aria-live="polite">Введите цель и количество.</output>
+              <label class="field"><span>Цена выхода</span><input class="target-price grouped-number" type="text" inputmode="decimal" aria-describedby="target-result-0" placeholder="97 000"></label>
+              <label class="field"><span>Контрактов</span><input class="target-qty" type="number" min="0" step="1" inputmode="numeric" aria-describedby="target-result-0" placeholder="1"></label>
+              <button class="target-remove" type="button" aria-label="Удалить точку выхода">×</button>
+              <output id="target-result-0" class="target-result" role="status" aria-live="polite">Введите цену выхода и количество.</output>
             </div>
           </div>
-          <button id="add-target" class="add-target" type="button">+ Добавить цель</button>
+          <button id="add-target" class="add-target" type="button">+ Добавить точку выхода</button>
           <output id="targets-total" class="targets-total" role="status" aria-live="polite"></output>
         </details>
         <button id="result-jump" class="result-jump" type="button" aria-controls="calculation-result" hidden><span>Расчёт готов</span><b>Показать ↓</b></button>
@@ -85,14 +102,23 @@
 
       <aside class="answer" id="calculation-result">
         <div class="answer-head"><span id="direction">Сделка</span><span id="state">Введите условия</span></div>
-        <div class="main-answer"><span>Открыть</span><strong id="contracts">—</strong><b id="contract-word">контрактов</b></div>
+        <div class="main-answer"><span id="position-label">Открыть</span><strong id="contracts">—</strong><b id="contract-word">контрактов</b></div>
         <dl>
           <div class="primary"><dt>Убыток по стопу</dt><dd id="loss">—</dd></div>
           <div><dt>Нужно для открытия (ГО)</dt><dd id="margin">—</dd></div>
           <div><dt>Стоп</dt><dd id="stop-distance">—</dd></div>
-          <div id="profit-row" hidden><dt>Результат по целям</dt><dd id="profit">—</dd><small id="profit-meta"></small></div>
+          <div id="profit-row" hidden><dt>Прибыль / убыток по выходам</dt><dd id="profit">—</dd><small id="profit-meta"></small></div>
         </dl>
         <p id="note" role="status" aria-live="polite" aria-atomic="true">Введите вход, стоп и риск.</p>
+        <section id="position-summary" class="position-summary" aria-label="Позиция и обеспечение" hidden>
+          <h2>Позиция и обеспечение</h2>
+          <dl>
+            <div><dt>Позиция на сумму</dt><dd id="notional">—</dd></div>
+            <div><dt>Заблокируется ГО</dt><dd id="position-margin">—</dd></div>
+            <div><dt>Расчётное плечо</dt><dd id="leverage">—</dd></div>
+          </dl>
+          <p>Стоимость позиции рассчитана по цене входа. Для открытия блокируется ГО; у брокера оно может отличаться.</p>
+        </section>
         <section class="risk-targets" aria-label="Цели по риску">
           <button id="targets-toggle" class="targets-toggle" type="button" aria-expanded="false" aria-controls="targets-panel" aria-describedby="note" disabled><span>Расчётные уровни 1R / 2R / 3R</span><b aria-hidden="true">+</b></button>
           <div id="targets-panel" hidden>
@@ -127,20 +153,21 @@
       <div class="guide-heading">
         <span>Перед сделкой</span>
         <h2 id="guide-title">Как рассчитать размер позиции по фьючерсу</h2>
-        <p>Калькулятор рассчитывает размер позиции по фьючерсу: переводит расстояние до стопа в рубли и показывает, сколько контрактов укладывается в заданный риск.</p>
+        <p>Калькулятор подбирает количество контрактов по риску или считает риск, обеспечение и результат позиции с заданным количеством.</p>
       </div>
       <div class="guide-grid">
         <article><span class="guide-number">01</span><h3>Выберите контракт</h3><p>Начните вводить код или название: например, <b>Si-9.26</b> или <b>SiU6</b>. Мы подставим шаг цены, стоимость шага, ГО и дату экспирации.</p></article>
-        <article><span class="guide-number">02</span><h3>Укажите вход и стоп</h3><p>Направление определяется автоматически. Чем дальше стоп от входа, тем меньше контрактов допустимо при том же риске.</p></article>
-        <article><span class="guide-number">03</span><h3>Задайте риск</h3><p>Можно указать процент от счёта или готовую сумму в рублях. Во втором случае размер счёта вводить не нужно.</p></article>
+        <article><span class="guide-number">02</span><h3>Выберите способ расчёта</h3><p>Калькулятор может посчитать количество контрактов по риску или проверить уже выбранное количество. Во втором режиме стоп необязателен.</p></article>
+        <article><span class="guide-number">03</span><h3>Добавьте точки выхода</h3><p>Укажите полные или частичные выходы. Калькулятор сложит прибыль и убытки, а при наличии стопа покажет итоговый риск / прибыль.</p></article>
       </div>
       <div class="method">
         <div><span>Что входит в результат</span><h2>Что рассчитывает калькулятор фьючерсов</h2></div>
-        <p>Риск одного контракта считается по расстоянию между входом и стопом с учётом стоимости шага цены. Количество контрактов округляется вниз, чтобы расчётный убыток не превышал выбранный лимит. Если указать цели, калькулятор дополнительно покажет потенциальный результат. Комиссии, проскальзывание и гэпы в расчёт не входят.</p>
+        <p>Риск одного контракта считается по расстоянию между входом и стопом с учётом стоимости шага цены. Количество контрактов округляется вниз, чтобы расчётный убыток не превышал выбранный лимит. Для заданной позиции калькулятор показывает результат точек выхода, стоимость позиции, ГО и расчётное плечо. Комиссии, проскальзывание и гэпы в расчёт не входят.</p>
       </div>
       <div class="faq">
         <h2>Частые вопросы</h2>
         <details><summary>Как рассчитать количество фьючерсных контрактов?<span aria-hidden="true">+</span></summary><p>Допустимый риск делится на риск одного контракта. Риск одного контракта рассчитывается по расстоянию между входом и стопом, шагу цены и стоимости шага. Результат округляется вниз.</p></details>
+        <details><summary>Можно ли посчитать результат уже открытой позиции?<span aria-hidden="true">+</span></summary><p>Да. Выберите режим «Риск и итог позиции», укажите направление, цену входа и количество контрактов. Стоп нужен только для расчёта убытка и отношения риска к прибыли; прибыль или убыток по точкам выхода можно посчитать без него.</p></details>
         <details><summary>Что такое гарантийное обеспечение фьючерса?<span aria-hidden="true">+</span></summary><p>Гарантийное обеспечение, или ГО, — сумма, необходимая для открытия позиции. Это не полная стоимость контракта и не максимальный возможный убыток. Калькулятор показывает требуемое ГО для рассчитанного количества контрактов.</p></details>
         <details><summary>Как обновляются параметры контрактов?<span aria-hidden="true">+</span></summary><p>Шаг цены, стоимость шага, гарантийное обеспечение и дата экспирации обновляются автоматически из открытых рыночных данных. При временной недоступности источника используется последняя сохранённая версия.</p></details>
         <details><summary>Почему калькулятор показывает ноль контрактов?<span aria-hidden="true">+</span></summary><p>Расчётный риск одного контракта превышает заданный лимит. Калькулятор не округляет количество вверх, поэтому показывает 0.</p></details>
