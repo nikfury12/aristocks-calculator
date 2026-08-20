@@ -48,6 +48,7 @@ function clearTargets(){el.targetsToggle.disabled=true;el.targetsToggle.setAttri
 function targetPrice(value,step){const decimals=(String(step).split('.')[1]||'').length;return Number((Math.round(value/step)*step).toFixed(Math.min(decimals,8)))}
 function updateTargets(entry,distance,direction,unit,contracts){if(contracts<1){clearTargets();return}el.targetsToggle.disabled=false;riskTargets.forEach(item=>{const value=targetPrice(entry+(direction==='BUY'?1:-1)*distance*item.r,current.minStep),result=contracts*distance*item.r*unit;item.price.textContent=price(value);item.profit.textContent=`≈ ${money(result)}`})}
 const manualTargetRows=()=>[...el.manualTargets.querySelectorAll('.trade-target')];
+const hasManualTargets=()=>manualTargetRows().some(row=>[...row.querySelectorAll('input')].some(input=>input.value.trim()));
 let targetRowCounter=0;
 function prepareTargetRow(row){const output=row.querySelector('.target-result'),id=`target-result-${targetRowCounter++}`;output.id=id;output.setAttribute('role','status');output.setAttribute('aria-live','polite');row.querySelectorAll('input').forEach(input=>input.setAttribute('aria-describedby',id))}
 function updateManualTargets(){
@@ -94,7 +95,7 @@ function calculate(){
  el.resultSocial.hidden=false;
  el.resultJump.hidden=false;
 }
-function setCalculationMode(mode){const position=mode==='position',riskQuantity=position&&!el.riskControls.hidden&&targetContext?.contracts>0?targetContext.contracts:0;if(riskQuantity)el.positionQuantity.value=String(riskQuantity);el.riskControls.hidden=position;el.positionControls.hidden=!position;el.stopOptional.hidden=!position;el.positionLabel.textContent=position?'В позиции':'Открыть';el.targetPlan.open=position;calculate()}
+function setCalculationMode(mode){const position=mode==='position',riskQuantity=position&&!el.riskControls.hidden&&targetContext?.contracts>0?targetContext.contracts:0;if(riskQuantity)el.positionQuantity.value=String(riskQuantity);el.riskControls.hidden=position;el.positionControls.hidden=!position;el.stopOptional.hidden=!position;el.positionLabel.textContent=position?'В позиции':'Открыть';el.targetPlan.open=position||hasManualTargets();calculate()}
 function setMode(mode,convert=true){const rub=mode==='rubles',account=num(el.account.value),risk=num(el.risk.value);if(convert){if(account>0&&risk>0)el.risk.value=rub?Math.round(account*risk/100):Number(risk/account*100).toFixed(2);else el.risk.value=''}el.accountField.hidden=rub;el.riskPair.classList.toggle('rubles',rub);el.riskLabel.textContent=rub?'Максимальный убыток':'Риск на сделку';el.riskUnit.textContent=rub?'₽':'%';el.risk.placeholder=rub?'1 500':'1';formatGroupedNumber(el.risk);calculate()}
 function chooseInstrument(found,focusNext=false){if(!found)return false;current=found;instrument.value=displayLabel(current);updateInstrumentInfo();closeSuggestions();calculate();checkLiquidity(current);if(focusNext)el.entry.focus();return true}
 function selectInstrument(){const found=activeSuggestion>=0?suggestionItems[activeSuggestion]:searchInstruments(instrument.value)[0];return chooseInstrument(found)}
