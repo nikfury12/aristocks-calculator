@@ -106,7 +106,7 @@
       <div class="intro">
         <div>
           <h1>Калькулятор позиции</h1>
-          <p>Калькулятор может подобрать количество контрактов по допустимому риску или посчитать уже заданную позицию.</p>
+          <p>Калькулятор может посчитать количество по допустимому риску или показать риск и итог для выбранного количества контрактов.</p>
         </div>
         <button class="reset" type="button" id="reset">Сбросить</button>
       </div>
@@ -116,11 +116,11 @@
         <div class="mode-switch">
           <button class="mode" type="button" data-mode="risk" aria-pressed="true">
             <span class="mode-index">01</span>
-            <span><strong>Подобрать количество по риску</strong><small>Калькулятор определит количество по входу, стопу и допустимому убытку</small></span>
+            <span><strong>Посчитать количество по риску</strong><small>Калькулятор определит количество по входу, стопу и допустимому убытку</small></span>
           </button>
           <button class="mode" type="button" data-mode="quantity" aria-pressed="false">
             <span class="mode-index">02</span>
-            <span><strong>Посчитать заданную позицию</strong><small>Калькулятор посчитает риск и итог для указанного количества контрактов</small></span>
+            <span><strong>Посчитать риск и итог</strong><small>Укажите количество контрактов — калькулятор покажет риск, ГО и итог по выходам</small></span>
           </button>
         </div>
       </section>
@@ -173,7 +173,7 @@
             <div class="metric"><dt>Убыток по стопу</dt><dd class="loss" id="stop-loss">1 000 ₽</dd></div>
             <div class="metric"><dt>Нужно для открытия (ГО)</dt><dd id="margin">13 181 ₽</dd></div>
             <div class="metric"><dt>Прибыль / убыток по выходам</dt><dd class="profit" id="exit-total">+500 ₽</dd></div>
-            <div class="metric"><dt>Результат относительно риска</dt><dd id="rr">+0,50R</dd></div>
+            <div class="metric"><dt>Итоговый риск / прибыль</dt><dd id="rr">+0,50R</dd></div>
           </dl>
           <section class="exposure">
             <div class="exposure-title"><span>Позиция и обеспечение</span></div>
