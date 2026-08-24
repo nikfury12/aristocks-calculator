@@ -102,6 +102,31 @@ function selectInstrument(){const found=activeSuggestion>=0?suggestionItems[acti
 form.addEventListener('input',e=>{if(e.target.matches('.grouped-number')&&!e.isComposing)formatGroupedNumber(e.target);if(e.target===instrument)renderSuggestions(instrument.value);else if(!['riskMode','calculationMode'].includes(e.target.name))calculate()});form.addEventListener('change',e=>{if(e.target.name==='riskMode')setMode(e.target.value);if(e.target.name==='calculationMode')setCalculationMode(e.target.value);if(e.target.name==='positionDirection')calculate()});
 instrument.addEventListener('focus',()=>{instrument.select();renderSuggestions('',true)});instrument.addEventListener('blur',()=>{setTimeout(()=>{closeSuggestions();instrument.value=displayLabel(current)},100)});instrument.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();if(instrumentList.hidden)renderSuggestions('',true);if(suggestionItems.length)markSuggestion(activeSuggestion+1)}else if(e.key==='ArrowUp'){e.preventDefault();if(suggestionItems.length)markSuggestion(activeSuggestion<=0?suggestionItems.length-1:activeSuggestion-1)}else if(e.key==='Escape'){closeSuggestions();instrument.value=displayLabel(current)}else if(e.key==='Enter'){e.preventDefault();if(selectInstrument())el.entry.focus()}});el.instrumentToggle.addEventListener('click',()=>{if(instrumentList.hidden){instrument.focus();renderSuggestions('',true)}else closeSuggestions()});el.entry.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();el.stop.focus()}});el.stop.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();(calculationMode()==='position'?el.positionQuantity:el.risk).focus()}});
 $('#copy').addEventListener('click',async()=>{await navigator.clipboard.writeText(el.note.textContent);$('#copy').textContent='Скопировано';setTimeout(()=>$('#copy').textContent='Скопировать расчёт',1200)});
+const feedbackLink=$('.calculator-feedback-link');
+function fillFeedbackFields(values){Object.entries(values).forEach(([name,value])=>{document.querySelectorAll(`[name="${name}"]`).forEach(field=>{field.value=value;field.dispatchEvent(new Event('input',{bubbles:true}));field.dispatchEvent(new Event('change',{bubbles:true}))})})}
+function buildFeedbackContext(){
+ const data=new FormData(form),calcMode=data.get('calculationMode')||'risk',riskMode=data.get('riskMode')||'rubles',targets=manualTargetRows().map((row,index)=>{const target=row.querySelector('.target-price').value.trim(),quantity=row.querySelector('.target-qty').value.trim(),result=row.querySelector('.target-result').textContent.trim();return target||quantity?`${index+1}) цена ${target||'не указана'}, количество ${quantity||'не указано'}${result?` — ${result}`:''}`:''}).filter(Boolean);
+ const lines=[
+  `Состояние: ${el.state.textContent.trim()}`,
+  `Режим: ${calcMode==='position'?'заданная позиция':'количество по риску'}`,
+  `Контракт: ${current?.secid||instrument.value.trim()||'не выбран'}`,
+  current?`Параметры контракта: шаг цены ${current.minStep}; стоимость шага ${current.stepPrice} ₽; ГО ${current.margin} ₽; экспирация ${current.expiry||'не указана'}`:'',
+  `Цена входа: ${el.entry.value.trim()||'не указана'}`,
+  `Стоп: ${el.stop.value.trim()||'не указан'}`,
+  calcMode==='position'?`Количество: ${el.positionQuantity.value.trim()||'не указано'}`:`Лимит риска: ${el.risk.value.trim()||'не указан'} ${riskMode==='percent'?'%':'₽'}`,
+  calcMode==='risk'&&riskMode==='percent'?`Размер счёта: ${el.account.value.trim()||'не указан'} ₽`:'',
+  `Результат: ${el.positionLabel.textContent.trim()} ${el.contracts.textContent.trim()} ${el.word.textContent.trim()}`,
+  `Расчётный убыток: ${el.loss.textContent.trim()}`,
+  `Требуемое ГО: ${el.margin.textContent.trim()}`,
+  el.positionSummary.hidden?'':`Стоимость позиции: ${el.notional.textContent.trim()}; плечо ${el.leverage.textContent.trim()}`,
+  targets.length?`Точки выхода:\n${targets.join('\n')}`:'',
+  `Комментарий калькулятора: ${el.note.textContent.trim()}`,
+  `Источник данных: ${el.status.textContent.trim().replace(/\s+/g,' ')}`
+ ].filter(Boolean);
+ return lines.join('\n');
+}
+function syncFeedbackForm(){const values={calculator_name:'Калькулятор фьючерсов MOEX',calculator_version:'2026.08.24',calculation_context:buildFeedbackContext(),technical_context:[`Дата: ${new Date().toISOString()}`,`Экран: ${window.innerWidth}×${window.innerHeight}`,`Браузер: ${navigator.userAgent}`].join('\n'),page_url:location.href.split('#')[0]};fillFeedbackFields(values);setTimeout(()=>fillFeedbackFields(values),120)}
+feedbackLink?.addEventListener('click',syncFeedbackForm);
 el.targetsToggle.addEventListener('click',()=>{if(el.targetsToggle.disabled)return;const open=el.targetsPanel.hidden;el.targetsPanel.hidden=!open;el.targetsToggle.setAttribute('aria-expanded',String(open));el.targetsLabel.textContent=open?'Скрыть расчётные уровни':'Расчётные уровни 1R / 2R / 3R'});
 el.addTarget.addEventListener('click',()=>{if(manualTargetRows().length>=5)return;const row=manualTargetRows()[0].cloneNode(true);row.querySelectorAll('input').forEach(input=>{input.value='';input.removeAttribute('aria-invalid')});row.querySelector('.target-result').textContent='Введите цену выхода и количество.';prepareTargetRow(row);el.manualTargets.append(row);syncTargetRows();row.querySelector('.target-price').focus()});
 el.manualTargets.addEventListener('click',event=>{const button=event.target.closest('.target-remove');if(!button)return;button.closest('.trade-target').remove();syncTargetRows();calculate()});manualTargetRows().forEach(prepareTargetRow);syncTargetRows();

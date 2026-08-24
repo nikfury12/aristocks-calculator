@@ -127,5 +127,5 @@ const finalScript = `(async()=>{if(!document.documentElement.lang)document.docum
 new Function(finalScript);
 embed = embed.slice(0, scriptStart) + `<script>${finalScript}\n` + embed.slice(scriptEnd);
 
-await writeFile(embedPath, embed, 'utf8');
+await writeFile(embedPath, `\uFEFF${embed.replace(/^\uFEFF/, '')}`, 'utf8');
 console.log(JSON.stringify({ bytes: Buffer.byteLength(embed), rootChars: root.length, appChars: app.length }));
