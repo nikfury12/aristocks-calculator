@@ -119,7 +119,7 @@ if (!embed.includes('id="aristocks-entry-plan-css"')) {
   embed = embed.slice(0, insertAt) + entryPlanCss + embed.slice(insertAt);
 }
 
-const positionDirectionCss = '<style id="aristocks-position-direction-css">#aristocks-calculator .direction-choice legend small{margin-left:5px;color:#8a918f;font-size:8px;font-weight:400}#aristocks-calculator .answer .primary.stop-positive dd{color:#8ed9c4}#aristocks-calculator .answer .primary.stop-neutral dd{color:#fff}#aristocks-calculator .unit-risk[data-stop-result="profit"] #unit-risk-value{color:#177d61}@media(max-width:720px){#aristocks-calculator .direction-choice legend small{font-size:10px}}</style>';
+const positionDirectionCss = '<style id="aristocks-position-direction-css">#aristocks-calculator .direction-choice>small{display:block;margin-top:7px;color:#737c79;font-size:8px;line-height:1.4}#aristocks-calculator .answer .primary.stop-positive dd{color:#8ed9c4}#aristocks-calculator .answer .primary.stop-neutral dd{color:#fff}#aristocks-calculator .unit-risk[data-stop-result="profit"] #unit-risk-value{color:#177d61}@media(max-width:720px){#aristocks-calculator .direction-choice>small{font-size:12px}}</style>';
 embed = embed.replace(/<style id="aristocks-position-direction-css">[\s\S]*?<\/style>/, positionDirectionCss);
 if (!embed.includes('id="aristocks-position-direction-css"')) {
   const insertAt = embed.indexOf('<div id="aristocks-calculator">');
