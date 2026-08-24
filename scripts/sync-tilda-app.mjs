@@ -29,6 +29,13 @@ const embedRootEnd = embed.indexOf('<script>\nwindow.ARISTOCKS_CALCULATOR_ROOT',
 if (embedRootStart < 0 || embedRootEnd < 0) throw new Error('Calculator root not found in Tilda embed');
 embed = embed.slice(0, embedRootStart) + root + '\n' + embed.slice(embedRootEnd);
 
+const pageShellCss = '<style id="aristocks-page-shell-css">html:has(#aristocks-calculator){margin:0;min-height:100%;background:#f3f5f2}body:has(#aristocks-calculator){margin:0;min-height:100vh;background:#f3f5f2}#aristocks-calculator{min-height:100vh}</style>';
+embed = embed.replace(/<style id="aristocks-page-shell-css">[\s\S]*?<\/style>/, pageShellCss);
+if (!embed.includes('id="aristocks-page-shell-css"')) {
+  const insertAt = embed.indexOf('<div id="aristocks-calculator">');
+  embed = embed.slice(0, insertAt) + pageShellCss + embed.slice(insertAt);
+}
+
 const headerCss = '<style id="aristocks-header-css">#aristocks-calculator header{position:static;height:88px;padding:0 max(28px,calc((100vw - 1060px)/2));display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-bottom:1px solid rgba(24,32,31,.12);background:rgba(243,245,242,.92)}#aristocks-calculator .brand{font-size:27px;letter-spacing:.025em}#aristocks-calculator .header-socials{justify-self:end;gap:18px;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em}#aristocks-calculator .header-socials .social-primary{width:100px;height:42px;padding:0;display:grid;place-items:center;border-width:1px;border-radius:3px}@media(max-width:720px){#aristocks-calculator header{height:92px;padding-inline:20px;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;align-content:center;row-gap:7px}#aristocks-calculator .brand{grid-column:1;grid-row:1;font-size:27px}#aristocks-calculator #data-status{grid-column:1;grid-row:2;justify-self:start;font-size:8px}#aristocks-calculator .header-socials{grid-column:2;grid-row:1/3;align-self:center;gap:11px;font-size:9px;letter-spacing:.03em}#aristocks-calculator .header-socials .social-primary{width:88px;height:36px;padding:0}}</style>';
 const socialButtonCss = '<style id="aristocks-social-button-css">#aristocks-calculator .header-socials .social-primary{width:100px;height:42px;min-height:0;padding:0;display:grid;place-items:center}@media(max-width:720px){#aristocks-calculator .header-socials .social-primary{width:88px;height:36px;min-height:0;padding:0}}</style>';
 embed = embed.replace(/<style id="aristocks-social-button-css">[\s\S]*?<\/style>/, socialButtonCss);
