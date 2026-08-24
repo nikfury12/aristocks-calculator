@@ -61,10 +61,9 @@
         <div id="position-controls" class="position-controls" hidden>
           <label class="field"><span>Количество контрактов</span><input id="position-quantity" name="positionQuantity" type="number" min="1" step="1" inputmode="numeric" placeholder="1"></label>
           <fieldset class="direction-choice" aria-describedby="direction-help">
-            <legend>Направление позиции</legend>
+            <legend>Направление <small id="direction-help">укажите вручную</small></legend>
             <label><input type="radio" name="positionDirection" value="BUY" checked><span>Лонг</span></label>
             <label><input type="radio" name="positionDirection" value="SELL"><span>Шорт</span></label>
-            <small id="direction-help">Определим по первому входу и стопу. Можно изменить.</small>
           </fieldset>
         </div>
 
