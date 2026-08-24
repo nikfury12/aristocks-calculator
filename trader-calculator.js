@@ -66,15 +66,14 @@ function clearResult(message='Выберите контракт и введит�
 function invalidResult(message,fields=[]){clearResult(message);markFieldErrors(fields);setNotice(message,'critical');el.state.textContent='Проверьте ввод';el.answer.classList.add('error')}
 function calculate(){
  const data=new FormData(form),calcMode=data.get('calculationMode')||'risk',mode=data.get('riskMode')||'rubles',entry=num(el.entry.value),stop=num(el.stop.value),account=num(el.account.value),risk=num(el.risk.value),positionQuantity=Math.max(0,Math.floor(num(el.positionQuantity.value)));
- const autoDirection=entry>0&&stop>0&&entry!==stop,needsManualDirection=calcMode==='position'&&entry>0&&positionQuantity>0&&!autoDirection;
- el.directionChoice.hidden=!needsManualDirection;
  updateUnitRisk(entry,stop);updateRiskAmount(mode,account,risk);
  const untouched=calcMode==='risk'?!el.entry.value&&!el.stop.value&&!el.risk.value&&(mode==='rubles'||!el.account.value):!el.entry.value&&!el.stop.value&&!el.positionQuantity.value;if(untouched){clearResult();return}
  clearFieldErrors();
  if(!current){invalidResult('Выберите контракт.',[instrument]);return}
  if(entry<=0){invalidResult('Укажите цену входа.',[el.entry]);return}
  if(stop>0&&entry===stop){invalidResult('Стоп должен отличаться от цены входа.',[el.entry,el.stop]);return}
- const unit=current.stepPrice/current.minStep;
+ const unit=current.stepPrice/current.minStep,autoDirection=entry>0&&stop>0&&entry!==stop;
+ el.directionChoice.hidden=calcMode==='position'&&autoDirection;
  let direction,distance=stop>0?Math.abs(entry-stop):0,riskOne=distance*unit,contracts=0,marginLimited=false,highRisk=false,byRisk=0,byMargin=Infinity,budget=0;
  if(calcMode==='risk'){
   if(stop<=0||risk<=0||(mode==='percent'&&account<=0)){const fields=[];if(stop<=0)fields.push(el.stop);if(risk<=0)fields.push(el.risk);if(mode==='percent'&&account<=0)fields.push(el.account);invalidResult(mode==='percent'?'Заполните вход, стоп, счёт и риск.':'Заполните вход, стоп и риск.',fields);return}
