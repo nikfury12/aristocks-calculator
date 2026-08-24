@@ -67,6 +67,20 @@
           </fieldset>
         </div>
 
+        <details id="entry-plan" class="entry-plan" hidden>
+          <summary><strong id="entry-plan-label">Несколько входов и средняя цена</strong><span aria-hidden="true">+</span></summary>
+          <div id="additional-entries">
+            <div class="entry-leg">
+              <label class="field"><span>Цена следующего входа</span><input class="entry-leg-price grouped-number" type="text" inputmode="decimal" aria-describedby="average-entry entry-plan-note" placeholder="94 500"></label>
+              <label class="field"><span>Контрактов</span><input class="entry-leg-qty" type="number" min="1" step="1" inputmode="numeric" aria-describedby="average-entry entry-plan-note" placeholder="1"></label>
+              <button class="entry-leg-remove" type="button" aria-label="Удалить дополнительный вход">×</button>
+            </div>
+          </div>
+          <button id="add-entry-leg" class="add-entry-leg" type="button">+ Добавить вход</button>
+          <output id="average-entry" class="average-entry">Укажите цену и количество следующего входа.</output>
+          <p id="entry-plan-note" class="entry-plan-note">Расчёт подходит, если все входы сделаны до частичных выходов.</p>
+        </details>
+
         <div id="risk-controls">
           <div class="risk-head">
             <span>Риск</span>
