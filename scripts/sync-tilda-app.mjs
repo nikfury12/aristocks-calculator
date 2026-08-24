@@ -25,7 +25,7 @@ const body = index.slice(rootStart, rootEnd).trim().replace(/>\s+</g, '><');
 const root = `<div id="aristocks-calculator">${body}</div>`;
 
 const embedRootStart = embed.indexOf('<div id="aristocks-calculator">');
-const embedRootEnd = embed.indexOf('<script>\nwindow.ARISTOCKS_CALCULATOR_ROOT', embedRootStart);
+const embedRootEnd = embed.indexOf('<script>', embedRootStart);
 if (embedRootStart < 0 || embedRootEnd < 0) throw new Error('Calculator root not found in Tilda embed');
 embed = embed.slice(0, embedRootStart) + root + '\n' + embed.slice(embedRootEnd);
 
