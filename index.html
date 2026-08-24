@@ -60,10 +60,11 @@
 
         <div id="position-controls" class="position-controls" hidden>
           <label class="field"><span>Количество контрактов</span><input id="position-quantity" name="positionQuantity" type="number" min="1" step="1" inputmode="numeric" placeholder="1"></label>
-          <fieldset class="direction-choice">
-            <legend>Направление</legend>
+          <fieldset class="direction-choice" aria-describedby="direction-help">
+            <legend>Направление позиции</legend>
             <label><input type="radio" name="positionDirection" value="BUY" checked><span>Лонг</span></label>
             <label><input type="radio" name="positionDirection" value="SELL"><span>Шорт</span></label>
+            <small id="direction-help">Определим по первому входу и стопу. Можно изменить.</small>
           </fieldset>
         </div>
 
@@ -118,7 +119,7 @@
         <div class="answer-head"><span id="direction">Сделка</span><span id="state">Введите условия</span></div>
         <div class="main-answer"><span id="position-label">Открыть</span><strong id="contracts">—</strong><b id="contract-word">контрактов</b></div>
         <dl>
-          <div class="primary"><dt>Убыток по стопу</dt><dd id="loss">—</dd></div>
+          <div id="stop-result-row" class="primary"><dt id="stop-result-label">Убыток по стопу</dt><dd id="loss">—</dd></div>
           <div><dt>Нужно для открытия (ГО)</dt><dd id="margin">—</dd></div>
           <div id="profit-row" hidden><dt>Прибыль / убыток по выходам</dt><dd id="profit">—</dd><small id="profit-meta"></small></div>
         </dl>
