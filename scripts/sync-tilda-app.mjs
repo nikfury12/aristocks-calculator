@@ -29,7 +29,10 @@ const embedRootEnd = embed.indexOf('<script>', embedRootStart);
 if (embedRootStart < 0 || embedRootEnd < 0) throw new Error('Calculator root not found in Tilda embed');
 embed = embed.slice(0, embedRootStart) + root + '\n' + embed.slice(embedRootEnd);
 
-const pageShellCss = '<style id="aristocks-page-shell-css">html:has(#aristocks-calculator){margin:0;min-height:100%;background:#f3f5f2}body:has(#aristocks-calculator){margin:0;min-height:100vh;background:#f3f5f2}#aristocks-calculator{min-height:100vh}</style>';
+const tildaShellInit = `/* aristocks-t123-shell-start */const aristocksCalculatorRoot=document.getElementById('aristocks-calculator'),aristocksT123=aristocksCalculatorRoot&&aristocksCalculatorRoot.closest('.t123');if(aristocksT123&&aristocksCalculatorRoot.parentNode===aristocksT123){for(const node of [...aristocksT123.childNodes]){if(node===aristocksCalculatorRoot)break;if(node.nodeType===3&&!node.textContent.trim())node.remove()}}if(location.protocol==='file:'&&aristocksCalculatorRoot&&aristocksCalculatorRoot.parentNode===document.body){document.documentElement.style.cssText='margin:0;min-height:100%;background:#f3f5f2';document.body.style.cssText='margin:0;min-height:100vh;background:#f3f5f2'}window.ARISTOCKS_CALCULATOR_ROOT=aristocksCalculatorRoot;/* aristocks-t123-shell-end */`;
+embed = embed.replace(/\/\* aristocks-t123-shell-start \*\/[\s\S]*?\/\* aristocks-t123-shell-end \*\/|window\.ARISTOCKS_CALCULATOR_ROOT=document\.getElementById\('aristocks-calculator'\);/, tildaShellInit);
+
+const pageShellCss = '<style id="aristocks-page-shell-css">html:has(body>#aristocks-calculator){margin:0;min-height:100%;background:#f3f5f2}body:has(>#aristocks-calculator){margin:0;min-height:100vh;background:#f3f5f2}#aristocks-calculator{min-height:100vh}</style>';
 embed = embed.replace(/<style id="aristocks-page-shell-css">[\s\S]*?<\/style>/, pageShellCss);
 if (!embed.includes('id="aristocks-page-shell-css"')) {
   const insertAt = embed.indexOf('<div id="aristocks-calculator">');
